@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 @layer components {
-  .btn {
-    @apply bg-primary rounded-lg text-center flex justify-center items-center text-white h-[50px] w-full hover:opacity-90;
-  }
+    .btn {
+        @apply bg-black rounded-lg text-center flex justify-center items-center text-white h-[50px] w-full hover:opacity-90;
+    }
+}
+
+.logo_bg {
+    background: url("url:~assets/bg.svg") no-repeat;
 }

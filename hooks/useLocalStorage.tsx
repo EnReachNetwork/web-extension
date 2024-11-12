@@ -8,7 +8,7 @@ function useLocalStorage<T>(key: string, initialValue?: T) {
     useEffect(() => {
         getValue();
         storage.watch({
-            [key]: (change) => setStoredValue(change.newValue),
+            [key]: (change) => setStoredValue(parseValue(change.newValue)),
         });
     }, []);
 

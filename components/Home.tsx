@@ -7,7 +7,7 @@ import { Buttom } from "./Buttom";
 import { Connection } from "./Connection";
 import { Header } from "./Header";
 
-function HomeUI(p: { onClickUser: MouseEventHandler<HTMLElement> }) {
+function HomeUI(p: { onClickUser: MouseEventHandler<any> }) {
     return (
         <div className="flex flex-col items-center w-full h-full gap-5">
             <Header onClickUser={p.onClickUser} />
@@ -17,7 +17,7 @@ function HomeUI(p: { onClickUser: MouseEventHandler<HTMLElement> }) {
     );
 }
 
-function UserUI(p: { onBack: MouseEventHandler<HTMLElement> }) {
+function UserUI(p: { onBack: MouseEventHandler<any> }) {
     return (
         <div className="flex flex-col items-center w-full h-full gap-5">
             <div className="flex items-center justify-between w-full">

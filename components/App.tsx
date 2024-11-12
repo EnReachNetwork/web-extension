@@ -7,7 +7,10 @@ import { Providers } from "./Providers";
 
 function AppImpl() {
     const { isAuthenticated } = useAuthContext();
-    return isAuthenticated ? <Home /> : <Login />;
+
+    // return isAuthenticated ? <Home /> : <Login />;
+    // return <Home />;
+    return <Login />;
 }
 export const App: React.FC = () => {
     return (

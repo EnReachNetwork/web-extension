@@ -13,12 +13,12 @@ export const Login = () => {
         chrome.tabs.create({ url: "http://localhost:3001" });
     };
     return (
-        <div className="flex flex-col w-full h-full p-[30px]">
-            <img src={imgLogo} className="h-[65px] mt-[90px]" alt={"logo"} />
+        <div className="flex flex-col w-full h-full p-[30px] logo_bg">
+            <img src={imgLogo} className="h-[95px] mt-[50px]" alt={"logo"} />
             <button className="btn mt-auto" onClick={handleLogin}>
                 Sign In to EnReach.AI
             </button>
-            <p className="mb-5">
+            <p className="mt-[10px]">
                 Don't have an account? Go{" "}
                 <a href={"#"} className="text-primary" onClick={handleRegister}>
                     register

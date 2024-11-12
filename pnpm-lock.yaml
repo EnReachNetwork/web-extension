@@ -17,6 +17,9 @@ dependencies:
   axios:
     specifier: ^1.7.7
     version: 1.7.7
+  boring-avatars:
+    specifier: ^1.11.2
+    version: 1.11.2
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
@@ -3136,6 +3139,10 @@ packages:
 
   /boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
+    dev: false
+
+  /boring-avatars@1.11.2:
+    resolution: {integrity: sha512-3+wkwPeObwS4R37FGXMYViqc4iTrIRj5yzfX9Qy4mnpZ26sX41dGMhsAgmKks1r/uufY1pl4vpgzMWHYfJRb2A==}
     dev: false
 
   /brace-expansion@2.0.1:
