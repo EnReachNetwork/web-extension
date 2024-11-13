@@ -1,8 +1,8 @@
 {
   "name": "en-reach-ai",
-  "displayName": "En reach ai",
+  "displayName": "EnReach.AI",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
+  "description": "Web Extension for EnReach AI",
   "author": "wxydev002@outlook.com",
   "scripts": {
     "dev": "plasmo dev",
