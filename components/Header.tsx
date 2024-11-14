@@ -1,14 +1,18 @@
-import Avatar from "boring-avatars";
 import { MouseEventHandler } from "react";
+import userDefaultLogo from "url:~assets/IconuserDefaultLogo.png";
 
-// import {} from
 import { imgLogo } from "~constants";
 
 export const Header = (p: { onClickUser: MouseEventHandler<any> }) => {
     return (
         <div className="flex items-center justify-between w-full">
-            <img src={imgLogo} className="h-14" alt="logo" />
-            <Avatar size={24} variant="beam" className="h-6 w-6 flex justify-center items-center cursor-pointer" onClick={p.onClickUser} />
+            <div className="flex items-center justify-between w-full pr-5 ">
+                <img src={imgLogo} className="" alt={"logo"} />
+                <button onClick={p.onClickUser} >
+                    <img src={userDefaultLogo} className="" alt={"defaultLogo"} />
+                </button>
+
+            </div>
         </div>
     );
 };

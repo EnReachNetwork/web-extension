@@ -1,4 +1,5 @@
 import imgLogo_ from "url:~assets/logo.svg";
+
 export const imgLogo = imgLogo_;
 export const ROUTES = {
     HOME: "/",
@@ -17,7 +18,7 @@ export const KEYS = {
     CONNECT_ERR: "connectErr",
     UNCONNECTED: "unconnected",
 };
-export const StatusConnectList = ["idle", "connecting", "connected", "error"] as const;
+export const StatusConnectList = ["idle", "connecting", "connected", "error", "successConnected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];
 
 export const CON = {
@@ -26,6 +27,6 @@ export const CON = {
     NameForPopup: "EnReachAI_popup",
 };
 
-export const DashboardBase = 'http://localhost:3001'
+export const DashboardBase = "http://localhost:3001";
 
 export const Matches: string[] = ["<all_urls>", "http://*.enreach.com/*"];

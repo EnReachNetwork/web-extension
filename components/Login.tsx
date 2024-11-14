@@ -15,16 +15,16 @@ export const Login = () => {
     return (
         <div className="flex flex-col w-full h-full p-[30px] logo_bg">
             <img src={imgLogo} className="h-[95px] mt-[50px]" alt={"logo"} />
-            <button className="btn mt-auto" onClick={handleLogin}>
+            <button className="mt-auto btn" onClick={handleLogin}>
                 Sign In to EnReach.AI
             </button>
-            <p className="mt-[10px]">
+            <div className="mt-[10px] text-xs flex justify-center items-center ">
                 Don't have an account? Go{" "}
-                <a href={"#"} className="text-primary" onClick={handleRegister}>
+                <div className="mx-1 underline decoration-black underline-offset-4" onClick={handleRegister}>
                     register
-                </a>{" "}
+                </div>
                 with email
-            </p>
+            </div>
         </div>
     );
 };
