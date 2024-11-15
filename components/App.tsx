@@ -11,8 +11,8 @@ function AppImpl() {
     const { isAuthenticated } = useAuthContext();
 
     // return isAuthenticated ? <Home /> : <Login />;
-    // return <Home />;
-    return <Home />
+    return <Login />;
+    // return <Home />
 }
 export const App: React.FC = () => {
     return (

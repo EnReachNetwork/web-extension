@@ -18,7 +18,7 @@ export const KEYS = {
     CONNECT_ERR: "connectErr",
     UNCONNECTED: "unconnected",
 };
-export const StatusConnectList = ["idle", "connecting", "connected", "error", "successConnected"] as const;
+export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];
 
 export const CON = {
