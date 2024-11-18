@@ -13,10 +13,6 @@ export const KEYS = {
     AUTHENTIC: "authenticated",
     USER_INFO: "userInfo",
     STATUS_CONNECT: "statusConnect",
-    CONNECTING: "connecting",
-    CONNECTED: "connected",
-    CONNECT_ERR: "connectErr",
-    UNCONNECTED: "unconnected",
 };
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];

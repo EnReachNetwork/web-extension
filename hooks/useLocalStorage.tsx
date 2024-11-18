@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { StorageCallbackMap } from "@plasmohq/storage";
+
 import { storage } from "~libs/mstorage";
 
 function useLocalStorage<T>(key: string, initialValue?: T) {
@@ -7,28 +9,24 @@ function useLocalStorage<T>(key: string, initialValue?: T) {
 
     useEffect(() => {
         getValue();
-        storage.watch({
-            [key]: (change) => setStoredValue(parseValue(change.newValue)),
-        });
-    }, []);
-
-    const parseValue = (value: string) => {
-        try {
-            return JSON.parse(value);
-        } catch (e) {
-            return value;
-        }
-    };
-
+        const watchMap: StorageCallbackMap = {
+            [key]: (change) => setStoredValue(change.newValue),
+        };
+        storage.watch(watchMap);
+        return () => {
+            storage.unwatch(watchMap);
+        };
+    }, [key]);
+    
     const getValue = async () => {
-        const result = await storage.getItem(key);
+        const result = await storage.get<T>(key);
         console.info("useLocalStorage,getVaule,", key, result);
-        setStoredValue(parseValue(result) || initialValue);
+        setStoredValue(result || initialValue);
     };
 
     const setValue = (value?: T) => {
         setStoredValue(value);
-        storage.setItem(key, JSON.stringify(value));
+        storage.set(key, JSON.stringify(value));
     };
     return [storedValue, setValue] as const;
 }
