@@ -2,22 +2,16 @@ import React, { createContext, useContext, useEffect } from "react";
 
 import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
-import Api from "~libs/apis";
+import Api, { configAuth } from "~libs/apis";
+import { RES } from "~libs/type";
+import { User } from "~libs/user";
 
 interface AuthContextProps {
-    isAuthenticated: boolean;
-    userInfo: UserInfo;
+    userInfo?: User;
     logoutUser: () => Promise<void>;
 }
 
-interface UserInfo {
-    username: string;
-    role: string;
-}
-
 export const AuthContext = createContext<AuthContextProps>({
-    isAuthenticated: false,
-    userInfo: { username: "", role: "" },
     logoutUser: async () => {},
 });
 
@@ -26,41 +20,22 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    // const navigate = useNavigate();
     const [accessToken, setAccessToken] = useLocalStorage<string>(KEYS.ACCESS_TOKEN, "");
-    const [isAuthenticated, setIsAuthenticated] = useLocalStorage<boolean>(KEYS.AUTHENTIC, false);
-
-    const [userInfo, setUserInfo] = useLocalStorage<UserInfo>(KEYS.USER_INFO, { username: "", role: "" });
+    const [userInfo, setUserInfo] = useLocalStorage<User>(KEYS.USER_INFO);
     const logoutUser = async () => {
-        setAccessToken("");
-        setIsAuthenticated(false);
-        setUserInfo({ username: "", role: "" });
+        setAccessToken();
+        setUserInfo();
     };
-
-    const configureApiAuthorization = (accessToken: string) => {
-        if (accessToken) {
-            Api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        }
-    };
-
+    configAuth(accessToken);
     useEffect(() => {
-        if (accessToken) {
-            configureApiAuthorization(accessToken);
-            Api.get("/user/info").then((response) => {
-                setUserInfo({
-                    username: response.data.data.email,
-                    role: response.data.data.role,
-                });
-                setIsAuthenticated(true);
-            });
+        if (!userInfo && accessToken) {
+            Api.get<RES<User>>("/api/user/profile").then((res) => setUserInfo(res.data.data));
         }
-    }, [accessToken]);
-
+    }, [accessToken, userInfo]);
     return (
         <AuthContext.Provider
             value={{
-                isAuthenticated,
-                userInfo,
+                userInfo: userInfo,
                 logoutUser,
             }}
         >

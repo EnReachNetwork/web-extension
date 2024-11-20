@@ -17,7 +17,7 @@ function useLocalStorage<T>(key: string, initialValue?: T) {
             storage.unwatch(watchMap);
         };
     }, [key]);
-    
+
     const getValue = async () => {
         const result = await storage.get<T>(key);
         console.info("useLocalStorage,getVaule,", key, result);
@@ -26,7 +26,11 @@ function useLocalStorage<T>(key: string, initialValue?: T) {
 
     const setValue = (value?: T) => {
         setStoredValue(value);
-        storage.set(key, JSON.stringify(value));
+        if (!value) {
+            storage.remove(key);
+        } else {
+            storage.set(key, value);
+        }
     };
     return [storedValue, setValue] as const;
 }
