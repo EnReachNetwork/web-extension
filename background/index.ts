@@ -1,5 +1,7 @@
 import "@plasmohq/messaging/background";
 
+import axios from "axios";
+
 import { KEYS } from "~constants";
 import { storage } from "~libs/mstorage";
 import { User } from "~libs/user";
@@ -47,6 +49,15 @@ async function main() {
             !Boolean(e.newValue) && closeLast();
         },
     });
+    setInterval(() => {
+        axios
+            .get<{ ipString: string; ipType: "IPv4" | "IPv6" }>("https://api.bigdatacloud.net/data/client-ip")
+            .then((res) => {
+                console.info("ipdata:", res.data);
+                storage.set(KEYS.IP_DATA, res.data);
+            })
+            .catch(console.error);
+    }, 5000);
 }
 
 main().catch(console.error);

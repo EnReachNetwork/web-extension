@@ -10,9 +10,10 @@ export const ROUTES = {
 
 export const KEYS = {
     ACCESS_TOKEN: "accessToken",
-    AUTHENTIC: "authenticated",
     USER_INFO: "userInfo",
     STATUS_CONNECT: "statusConnect",
+    CONNECT_ID: "connectedId",
+    IP_DATA: "ipData",
 };
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];
@@ -24,7 +25,8 @@ export const CON = {
 };
 
 export const DashboardBase = "https://beta.dashboard.enreach.network";
-export const WSURL = "ws://dev-io.enreach.network";
+// export const WSURL = "https://dev-ws.enreach.network";
+export const WSURL = "wss://dev-ws.enreach.network";
 export const HOME_BASE = "https://enreach.network";
 
 export const Matches: string[] = ["<all_urls>", "http://*.enreach.network/*"];
