@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect } from "react";
 import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
 import Api, { configAuth } from "~libs/apis";
+import { genNodeId } from "~libs/genNodeId";
+import { storage } from "~libs/mstorage";
 import { RES } from "~libs/type";
 import { User } from "~libs/user";
 
@@ -25,12 +27,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logoutUser = async () => {
         setAccessToken();
         setUserInfo();
+        storage.set(KEYS.USER_LOGOUT, true);
     };
     configAuth(accessToken);
     useEffect(() => {
         if (!userInfo && accessToken) {
             Api.get<RES<User>>("/api/user/profile").then((res) => setUserInfo(res.data.data));
         }
+        if (userInfo) genNodeId(userInfo);
     }, [accessToken, userInfo]);
     return (
         <AuthContext.Provider

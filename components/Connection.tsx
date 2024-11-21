@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { round, toNumber } from "lodash";
 import React from "react";
 import { FiCheck } from "react-icons/fi";
 import berry from "url:~assets/IconBerry.png";
@@ -5,6 +7,8 @@ import rocket from "url:~assets/IconRocket.png";
 
 import { useCopy } from "~hooks/useCopy";
 import useLocalStorage from "~hooks/useLocalStorage";
+import Api from "~libs/apis";
+import { NodeID, RES } from "~libs/type";
 
 import { DashboardBase, KEYS, levels, StatusConnect } from "../constants";
 import { useAuthContext } from "./AuthContext";
@@ -17,7 +21,22 @@ export const Connection: React.FC = () => {
     const exp = userInfo?.stat?.exp || 0;
     const endLevel = levels.find((l) => l.exp > exp) || levels[levels.length - 1];
     const startLevel = levels[endLevel.level - 1];
-    const currentProcess = Math.floor(((exp - startLevel.exp) * 100) / (endLevel.exp - startLevel.exp));
+    const currentProcess = Math.floor((exp * 100) / endLevel.exp);
+    const [nodeID] = useLocalStorage<NodeID>(KEYS.NODE_ID);
+    const { data: netQuality } = useQuery({
+        queryKey: ["NetworkQuality", nodeID?.nodeId],
+        enabled: status == "connected" && Boolean(nodeID),
+        refetchInterval: 1000 * 60 * 5,
+        retry: true,
+        retryDelay: 5000,
+        refetchIntervalInBackground: true,
+        queryFn: async () => {
+            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID.nodeId}/reward`);
+            const reward = toNumber(res.data.data.lastReward);
+            if (!reward) return "-";
+            return round((reward * 100) / 10) + "%";
+        },
+    });
 
     return (
         <div className="flex flex-col items-center w-full flex-1 px-[25px] gap-[10px]">
@@ -34,7 +53,7 @@ export const Connection: React.FC = () => {
                 <>
                     <div className="flex bg-[#F5F5F5] w-full items-center justify-between px-5 py-3 text-sm rounded-lg">
                         <span className="font-normal leading-4 ">Network Quality:</span>
-                        <span className="font-bold leading-4 text-[#4281FF] ">50%</span>
+                        <span className="font-bold leading-4 text-[#4281FF] ">{netQuality}</span>
                     </div>
 
                     <div className="bg-[#F5F5F5] w-full  px-5 py-3 rounded-lg">
@@ -63,7 +82,7 @@ export const Connection: React.FC = () => {
                         <div className="flex justify-between font-bold leading-5 text-5 ">
                             <div className="flex items-center gap-[10px]">
                                 <span className="">
-                                    {exp - startLevel.exp}/{endLevel.exp - startLevel.exp}
+                                    {exp}/{endLevel.exp}
                                 </span>
                                 <span className="font-medium text-[10px] ">EXP</span>
                             </div>

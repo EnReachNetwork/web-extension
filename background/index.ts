@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { KEYS } from "~constants";
 import { storage } from "~libs/mstorage";
+import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
 import { closeLast, connect } from "./ws";
@@ -37,13 +38,16 @@ import { closeLast, connect } from "./ws";
 const connectByAuthUser = async () => {
     const auth = await storage.get(KEYS.ACCESS_TOKEN);
     const user = await storage.get<User>(KEYS.USER_INFO);
-    auth && user && connect(auth, user);
+    const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
+    console.info("nodeId", nodeId);
+    auth && user && nodeId && connect(auth, user, nodeId);
 };
 
 async function main() {
     connectByAuthUser();
     storage.watch({
         [KEYS.USER_INFO]: connectByAuthUser,
+        [KEYS.NODE_ID]: connectByAuthUser,
         [KEYS.ACCESS_TOKEN]: (e) => {
             console.info("do close last connect", !Boolean(e.newValue));
             !Boolean(e.newValue) && closeLast();
@@ -51,7 +55,7 @@ async function main() {
     });
     setInterval(() => {
         axios
-            .get<{ ipString: string; ipType: "IPv4" | "IPv6" }>("https://api.bigdatacloud.net/data/client-ip")
+            .get<IPData>("https://api.bigdatacloud.net/data/client-ip")
             .then((res) => {
                 console.info("ipdata:", res.data);
                 storage.set(KEYS.IP_DATA, res.data);

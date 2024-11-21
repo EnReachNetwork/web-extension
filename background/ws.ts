@@ -1,19 +1,21 @@
 import { io, Socket } from "socket.io-client";
+import { v5 as uuid } from "uuid";
 
 import { KEYS, StatusConnectList, WSURL } from "~constants";
 import { storage } from "~libs/mstorage";
+import { NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
 const lastSocket: { socket?: Socket } = {};
-
 export function closeLast() {
     if (lastSocket.socket) {
         lastSocket.socket.disconnect();
         lastSocket.socket = undefined;
     }
 }
-export function connect(token: string, user: User) {
+export async function connect(token: string, user: User, nodeId: NodeID) {
     closeLast();
+
     const socket = io(WSURL, {
         transports: ["websocket"],
         retries: 99999999,
@@ -22,7 +24,7 @@ export function connect(token: string, user: User) {
     // set connecting
     storage.set(KEYS.STATUS_CONNECT, StatusConnectList[1]);
     let pingTask: NodeJS.Timeout | null = null;
-    console.info("doConnect", user.id);
+    console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
         // connectedId
@@ -30,11 +32,11 @@ export function connect(token: string, user: User) {
         // set connected
         storage.set(KEYS.STATUS_CONNECT, StatusConnectList[2]);
         // for connect
-        socket.emit("auth", { userId: user.id });
+        socket.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
         // for uptime
         pingTask = setInterval(
             () => {
-                socket.emit("ping", { userId: user.id });
+                socket.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
             },
             1000 * 60 * 10,
         );

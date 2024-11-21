@@ -4,7 +4,9 @@ import { FiChevronLeft, FiLogOut } from "react-icons/fi";
 import discord from "url:~assets/IconDiscord.png";
 import x from "url:~assets/IconX.png";
 
-import { HOME_BASE } from "~constants";
+import { HOME_BASE, KEYS } from "~constants";
+import useLocalStorage from "~hooks/useLocalStorage";
+import { IPData } from "~libs/type";
 
 import { useAuthContext } from "./AuthContext";
 import { GoToDashboard } from "./Buttom";
@@ -23,7 +25,7 @@ function HomeUI(p: { onClickUser: MouseEventHandler<any> }) {
 
 function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const ac = useAuthContext();
-
+    const [ip] = useLocalStorage<IPData>(KEYS.IP_DATA);
     return (
         <div className="flex flex-col items-center w-full h-full gap-[10px]">
             <div className="flex items-center justify-between w-full">
@@ -36,7 +38,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
             <div className="flex flex-col gap-[10px] w-full px-[25px] mt-2.5">
                 <div className="bg-[#F5F5F5] w-full flex px-5 py-3 rounded-lg justify-between">
                     <span className="text-[#000000]">Node IP：</span>
-                    <span className="text-sm text-[#999999]">{"29.38.42.34"}</span>
+                    <span className="text-sm text-[#999999]">{ip?.ipString || "-"}</span>
                 </div>
                 <button className="text-base font-medium btn " onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
                     About EnReach.AI

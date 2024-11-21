@@ -14,6 +14,8 @@ export const KEYS = {
     STATUS_CONNECT: "statusConnect",
     CONNECT_ID: "connectedId",
     IP_DATA: "ipData",
+    NODE_ID: "nodeID",
+    USER_LOGOUT: "userLogout",
 };
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];

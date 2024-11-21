@@ -1,14 +1,17 @@
 import React from "react";
 
-import { DashboardBase, imgLogo } from "~constants";
+import { DashboardBase, imgLogo, KEYS } from "~constants";
+import { storage } from "~libs/mstorage";
 
 export const Login = () => {
     const handleLogin = async (e: React.FormEvent) => {
+        storage.remove(KEYS.USER_LOGOUT);
         e.preventDefault();
         chrome.tabs.create({ url: DashboardBase });
     };
 
     const handleRegister = async (e: React.FormEvent) => {
+        storage.remove(KEYS.USER_LOGOUT);
         e.preventDefault();
         chrome.tabs.create({ url: `${DashboardBase}/signup` });
     };
