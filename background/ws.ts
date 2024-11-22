@@ -7,6 +7,8 @@ import { User } from "~libs/user";
 
 const lastSocket: { socket?: Socket; uid?: string; pingTask?: NodeJS.Timeout; nodeId?: string; ip?: string } = {};
 export function closeLast() {
+    storage.set(KEYS.STATUS_CONNECT, StatusConnectList[0]);
+    storage.remove(KEYS.CONNECT_ID);
     if (lastSocket.socket) {
         lastSocket.socket.disconnect();
         lastSocket.socket = undefined;
@@ -26,7 +28,7 @@ export async function connect(token: string, user: User, nodeId: NodeID, ipData:
     });
     lastSocket.socket = socket;
     lastSocket.uid = user.id;
-    lastSocket.nodeId = lastSocket.nodeId;
+    lastSocket.nodeId = nodeId.nodeId;
     lastSocket.ip = ipData.ipString;
     // set connecting
     storage.set(KEYS.STATUS_CONNECT, StatusConnectList[1]);
@@ -39,11 +41,10 @@ export async function connect(token: string, user: User, nodeId: NodeID, ipData:
         storage.set(KEYS.STATUS_CONNECT, StatusConnectList[2]);
         // for connect
         socket.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
-
         // for uptime
         lastSocket.pingTask = setInterval(
             () => {
-                console.info("ping");
+                console.info("do ping to server");
                 socket.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
             },
             1000 * 60 * 10,
@@ -60,10 +61,11 @@ export async function connect(token: string, user: User, nodeId: NodeID, ipData:
     socket.on("disconnect", (reason) => {
         console.info("disconnect", user.id, reason);
         if (reason == "io server disconnect") {
-            // set idle
-            storage.set(KEYS.STATUS_CONNECT, StatusConnectList[0]);
-            storage.remove(KEYS.CONNECT_ID);
+            // close
             closeLast();
         }
     });
+    try {
+        (global as any).getEnreachState = () => ({ active: socket.active, id: socket.id });
+    } catch (error) {}
 }
