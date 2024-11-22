@@ -39,8 +39,9 @@ const connectByAuthUser = async () => {
     const auth = await storage.get(KEYS.ACCESS_TOKEN);
     const user = await storage.get<User>(KEYS.USER_INFO);
     const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
+    const ipData = await storage.get<IPData>(KEYS.IP_DATA);
     console.info("nodeId", nodeId);
-    auth && user && nodeId && connect(auth, user, nodeId);
+    auth && user && nodeId && ipData && ipData.ipType == "IPv4" && connect(auth, user, nodeId, ipData);
 };
 
 async function main() {
@@ -48,6 +49,7 @@ async function main() {
     storage.watch({
         [KEYS.USER_INFO]: connectByAuthUser,
         [KEYS.NODE_ID]: connectByAuthUser,
+        [KEYS.IP_DATA]: connectByAuthUser,
         [KEYS.ACCESS_TOKEN]: (e) => {
             console.info("do close last connect", !Boolean(e.newValue));
             !Boolean(e.newValue) && closeLast();
@@ -61,7 +63,7 @@ async function main() {
                 storage.set(KEYS.IP_DATA, res.data);
             })
             .catch(console.error);
-    }, 5000);
+    }, 10000);
 }
 
 main().catch(console.error);

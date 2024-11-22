@@ -63,11 +63,11 @@ export const Connection: React.FC = () => {
                         </div>
                         <div className="flex justify-between font-bold leading-5 text-5 mt-[10px]">
                             <div className="flex items-center gap-[10px]">
-                                <span className="">{userInfo?.point.total || 0}</span>
+                                <span className="">{round(userInfo?.point.total || 0, 1)}</span>
                                 <img src={berry} alt="berry" />
                             </div>
                             <div className="flex items-center gap-[10px]">
-                                <span className="">{userInfo?.stat.extraBoost || 1}x</span>
+                                <span className="">{round(toNumber(userInfo?.stat.extraBoost) || 1, 1)}x</span>
                                 <img src={rocket} alt="rocket" />
                             </div>
                         </div>

@@ -2,27 +2,34 @@ import { io, Socket } from "socket.io-client";
 
 import { KEYS, StatusConnectList, WSURL } from "~constants";
 import { storage } from "~libs/mstorage";
-import { NodeID } from "~libs/type";
+import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
-const lastSocket: { socket?: Socket } = {};
+const lastSocket: { socket?: Socket; uid?: string; pingTask?: NodeJS.Timeout; nodeId?: string; ip?: string } = {};
 export function closeLast() {
     if (lastSocket.socket) {
         lastSocket.socket.disconnect();
         lastSocket.socket = undefined;
     }
+    if (lastSocket.pingTask) {
+        clearInterval(lastSocket.pingTask);
+        lastSocket.pingTask = null;
+    }
 }
-export async function connect(token: string, user: User, nodeId: NodeID) {
+export async function connect(token: string, user: User, nodeId: NodeID, ipData: IPData) {
+    if (lastSocket.socket && lastSocket.socket.id && user.id === lastSocket.uid && nodeId.nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
+        return;
+    }
     closeLast();
-
     const socket = io(WSURL, {
         transports: ["websocket"],
-        retries: 99999999,
     });
     lastSocket.socket = socket;
+    lastSocket.uid = user.id;
+    lastSocket.nodeId = lastSocket.nodeId;
+    lastSocket.ip = ipData.ipString;
     // set connecting
     storage.set(KEYS.STATUS_CONNECT, StatusConnectList[1]);
-    let pingTask: NodeJS.Timeout | null = null;
     console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
@@ -32,29 +39,31 @@ export async function connect(token: string, user: User, nodeId: NodeID) {
         storage.set(KEYS.STATUS_CONNECT, StatusConnectList[2]);
         // for connect
         socket.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
+
         // for uptime
-        pingTask = setInterval(
+        lastSocket.pingTask = setInterval(
             () => {
+                console.info("ping");
                 socket.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
             },
             1000 * 60 * 10,
         );
         // fot test delay
         socket.on("ping", ({ id }) => {
-            console.info('onPing:', id)
+            console.info("onPing:", id);
             socket.emit("pong", { id });
         });
     });
     socket.on("connect_error", (e) => {
         console.error("socket:", e);
     });
-    socket.on("disconnect", () => {
-        console.info("disconnect", user.id);
-        // set idle
-        storage.set(KEYS.STATUS_CONNECT, StatusConnectList[0]);
-        storage.remove(KEYS.CONNECT_ID);
-        pingTask && clearInterval(pingTask);
-        pingTask = null;
-        lastSocket.socket = undefined;
+    socket.on("disconnect", (reason) => {
+        console.info("disconnect", user.id, reason);
+        if (reason == "io server disconnect") {
+            // set idle
+            storage.set(KEYS.STATUS_CONNECT, StatusConnectList[0]);
+            storage.remove(KEYS.CONNECT_ID);
+            closeLast();
+        }
     });
 }

@@ -38,7 +38,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
             <div className="flex flex-col gap-[10px] w-full px-[25px] mt-2.5">
                 <div className="bg-[#F5F5F5] w-full flex px-5 py-3 rounded-lg justify-between">
                     <span className="text-[#000000]">Node IP：</span>
-                    <span className="text-sm text-[#999999]">{ip?.ipString || "-"}</span>
+                    <span className="text-sm text-[#999999]">{ip?.ipType == "IPv4" ? ip?.ipString : "-"}</span>
                 </div>
                 <button className="text-base font-medium btn " onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
                     About EnReach.AI
