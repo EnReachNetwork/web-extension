@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return (
         <AuthContext.Provider
             value={{
-                userInfo: userInfo,
+                userInfo: accessToken ? userInfo : undefined,
                 logoutUser,
             }}
         >
