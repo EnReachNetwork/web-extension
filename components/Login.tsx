@@ -19,7 +19,7 @@ export const Login = () => {
         <div className="flex flex-col flex-1 w-full h-full p-[30px] logo_bg">
             <img src={imgLogo} className="h-[95px] mt-[50px]" alt={"logo"} />
             <button className="mt-auto btn" onClick={handleLogin}>
-                Sign In to EnReach.AI
+                Sign In to EnReach
             </button>
             <div className="mt-[10px] text-xs flex justify-center items-center ">
                 Don't have an account? Go{" "}

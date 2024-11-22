@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect } from "react";
 
 import { KEYS } from "~constants";
@@ -31,11 +32,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
     configAuth(accessToken);
     useEffect(() => {
-        if (!userInfo && accessToken) {
-            Api.get<RES<User>>("/api/user/profile").then((res) => setUserInfo(res.data.data));
-        }
         if (userInfo) genNodeId(userInfo);
-    }, [accessToken, userInfo]);
+    }, [userInfo]);
+
+    useQuery({
+        queryKey: ["queryUserInfo", accessToken],
+        enabled: !!accessToken,
+        refetchInterval: 60 * 1000 * 2,
+        queryFn: async () => {
+            const res = await Api.get<RES<User>>("/api/user/profile");
+            setUserInfo(res.data.data);
+            return res.data.data;
+        },
+    });
     return (
         <AuthContext.Provider
             value={{

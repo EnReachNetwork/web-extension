@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { round, toNumber } from "lodash";
+import _, { round, toNumber } from "lodash";
 import React from "react";
 import { FiCheck } from "react-icons/fi";
 import berry from "url:~assets/IconBerry.png";
@@ -37,7 +37,10 @@ export const Connection: React.FC = () => {
             return round((reward * 100) / 10) + "%";
         },
     });
-
+    const total = _.toNumber(userInfo?.point.total || 0 )
+    const boost = _.toNumber(userInfo?.stat.extraBoost) || 1
+    const mTotal = round(total * boost, 1)
+    const mBoost = round(boost, 1)
     return (
         <div className="flex flex-col items-center w-full flex-1 px-[25px] gap-[10px]">
             <ConAnim status={status} />
@@ -58,16 +61,16 @@ export const Connection: React.FC = () => {
 
                     <div className="bg-[#F5F5F5] w-full  px-5 py-3 rounded-lg">
                         <div className="flex justify-between text-[10px] font-normal leading-3 text-[#999999]">
-                            <span>Accumulated Rewards</span>
+                            <span>Total Rewards</span>
                             <span>Extra Boost</span>
                         </div>
                         <div className="flex justify-between font-bold leading-5 text-5 mt-[10px]">
                             <div className="flex items-center gap-[10px]">
-                                <span className="">{round(userInfo?.point.total || 0, 1)}</span>
+                                <span className="">{mTotal}</span>
                                 <img src={berry} alt="berry" />
                             </div>
                             <div className="flex items-center gap-[10px]">
-                                <span className="">{round(toNumber(userInfo?.stat.extraBoost) || 1, 1)}x</span>
+                                <span className="">{mBoost}x</span>
                                 <img src={rocket} alt="rocket" />
                             </div>
                         </div>

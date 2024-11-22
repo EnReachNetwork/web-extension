@@ -41,7 +41,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                     <span className="text-sm text-[#999999]">{ip?.ipType == "IPv4" ? ip?.ipString : "-"}</span>
                 </div>
                 <button className="text-base font-medium btn " onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
-                    About EnReach.AI
+                    About EnReach
                 </button>
                 <div className="px-6 flex items-center justify-between">
                     <div className="flex items-center gap-[15px]">
