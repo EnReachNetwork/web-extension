@@ -1,5 +1,4 @@
 import { io, Socket } from "socket.io-client";
-import { v5 as uuid } from "uuid";
 
 import { KEYS, StatusConnectList, WSURL } from "~constants";
 import { storage } from "~libs/mstorage";
@@ -42,6 +41,7 @@ export async function connect(token: string, user: User, nodeId: NodeID) {
         );
         // fot test delay
         socket.on("ping", ({ id }) => {
+            console.info('onPing:', id)
             socket.emit("pong", { id });
         });
     });

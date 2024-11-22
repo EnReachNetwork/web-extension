@@ -8,6 +8,6 @@ export const config: PlasmoCSConfig = {
 };
 
 const relayNames = ["ping", "getStat", "setAccessToken", "clearAccessToken", "clearLogout"];
-relayNames.forEach((name) => {
+for (const name of relayNames) {
     relay({ name }, sendToBackground);
-});
+}
