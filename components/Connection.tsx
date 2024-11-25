@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import _, { round, toNumber } from "lodash";
+import _ from "lodash";
 import React from "react";
 import { FiCheck } from "react-icons/fi";
 import berry from "url:~assets/IconBerry.png";
@@ -13,6 +13,7 @@ import { NodeID, RES } from "~libs/type";
 import { DashboardBase, KEYS, levels, StatusConnect } from "../constants";
 import { useAuthContext } from "./AuthContext";
 import ConAnim from "./ConAnim";
+import { fmtBerry, fmtBoost, fmtNetqulity } from "./fmtData";
 
 export const Connection: React.FC = () => {
     const { userInfo, logoutUser } = useAuthContext();
@@ -32,15 +33,13 @@ export const Connection: React.FC = () => {
         refetchIntervalInBackground: true,
         queryFn: async () => {
             const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID.nodeId}/reward`);
-            const reward = toNumber(res.data.data.lastReward);
-            if (!reward) return "-";
-            return round((reward * 100) / 10) + "%";
+            return fmtNetqulity(res.data.data.lastReward);
         },
     });
-    const total = _.toNumber(userInfo?.point.total || 0 )
-    const boost = _.toNumber(userInfo?.stat.extraBoost) || 1
-    const mTotal = round(total * boost, 1)
-    const mBoost = round(boost, 1)
+    const total = _.toNumber(userInfo?.point.total || 0);
+    const boost = fmtBoost(userInfo?.stat.extraBoost);
+    const mTotal = fmtBerry(total * boost);
+
     return (
         <div className="flex flex-col items-center w-full flex-1 px-[25px] gap-[10px]">
             <ConAnim status={status} />
@@ -70,7 +69,7 @@ export const Connection: React.FC = () => {
                                 <img src={berry} alt="berry" />
                             </div>
                             <div className="flex items-center gap-[10px]">
-                                <span className="">{mBoost}x</span>
+                                <span className="">{boost}x</span>
                                 <img src={rocket} alt="rocket" />
                             </div>
                         </div>
