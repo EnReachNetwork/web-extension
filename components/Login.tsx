@@ -1,6 +1,7 @@
 import React from "react";
 
-import { DashboardBase, imgLogo, KEYS } from "~constants";
+import { DashboardBase, KEYS } from "~constants";
+import { imgLogo } from "~libs/imgs";
 import { storage } from "~libs/mstorage";
 
 export const Login = () => {

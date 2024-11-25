@@ -1,9 +1,8 @@
 import Avatar from "boring-avatars";
 import { MouseEventHandler } from "react";
 
-import { imgLogo } from "~constants";
-
 import { useAuthContext } from "./AuthContext";
+import { imgLogo } from "~libs/imgs";
 
 export const Header = (p: { onClickUser: MouseEventHandler<any> }) => {
     const ac = useAuthContext();
