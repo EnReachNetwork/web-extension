@@ -40,19 +40,19 @@ export async function connect(token: string, user: User, nodeId: NodeID, ipData:
         // set connected
         storage.set(KEYS.STATUS_CONNECT, StatusConnectList[2]);
         // for connect
-        socket.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
+        socket.volatile.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
         // for uptime
         lastSocket.pingTask = setInterval(
             () => {
                 console.info("do ping to server");
-                socket.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
+                socket.volatile.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
             },
             1000 * 60 * 10,
         );
         // fot test delay
         socket.on("ping", ({ id }) => {
             console.info("onPing:", id);
-            socket.emit("pong", { id });
+            socket.volatile.emit("pong", { id });
         });
     });
     socket.on("connect_error", (e) => {

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import _ from "lodash";
 import React from "react";
+import { FaSpinner } from "react-icons/fa6";
 import { FiCheck } from "react-icons/fi";
 import berry from "url:~assets/IconBerry.png";
 import rocket from "url:~assets/IconRocket.png";
@@ -8,7 +9,8 @@ import rocket from "url:~assets/IconRocket.png";
 import { useCopy } from "~hooks/useCopy";
 import useLocalStorage from "~hooks/useLocalStorage";
 import Api from "~libs/apis";
-import { NodeID, RES } from "~libs/type";
+import { IPData, NodeID, RES } from "~libs/type";
+import { cn } from "~libs/utils";
 
 import { DashboardBase, KEYS, levels, StatusConnect } from "../constants";
 import { useAuthContext } from "./AuthContext";
@@ -16,7 +18,7 @@ import ConAnim from "./ConAnim";
 import { fmtBerry, fmtBoost, fmtNetqulity } from "./fmtData";
 
 export const Connection: React.FC = () => {
-    const { userInfo, logoutUser } = useAuthContext();
+    const { userInfo, logoutUser, isFetchingUserInfo } = useAuthContext();
     const [status] = useLocalStorage<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
     const copy = useCopy();
     const exp = userInfo?.stat?.exp || 0;
@@ -24,15 +26,16 @@ export const Connection: React.FC = () => {
     const startLevel = levels[endLevel.level - 1];
     const currentProcess = Math.floor((exp * 100) / endLevel.exp);
     const [nodeID] = useLocalStorage<NodeID>(KEYS.NODE_ID);
-    const { data: netQuality } = useQuery({
-        queryKey: ["NetworkQuality", nodeID?.nodeId],
-        enabled: status == "connected" && Boolean(nodeID),
-        refetchInterval: 1000 * 60 * 5,
+    const [ipData] = useLocalStorage<IPData>(KEYS.IP_DATA);
+    const { data: netQuality, isFetching: isFetchingNetQuality } = useQuery({
+        queryKey: ["NetworkQuality", nodeID?.nodeId, ipData?.ipString],
+        enabled: status == "connected" && Boolean(nodeID) && Boolean(ipData) && Boolean(ipData.ipString) && ipData.ipType == "IPv4",
+        refetchInterval: 1000 * 60 * 2,
         retry: true,
         retryDelay: 5000,
         refetchIntervalInBackground: true,
         queryFn: async () => {
-            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID.nodeId}/reward`);
+            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID.nodeId}/${encodeURIComponent(ipData.ipString)}/reward`);
             return fmtNetqulity(res.data.data.lastReward);
         },
     });
@@ -55,12 +58,13 @@ export const Connection: React.FC = () => {
                 <>
                     <div className="flex bg-[#F5F5F5] w-full items-center justify-between px-5 py-3 text-sm rounded-lg">
                         <span className="font-normal leading-4 ">Network Quality:</span>
-                        <span className="font-bold leading-4 text-[#4281FF] ">{netQuality}</span>
+                        <span className="font-bold leading-4 text-[#4281FF] ">{isFetchingNetQuality ? <FaSpinner className="animate-spin" /> : netQuality}</span>
                     </div>
 
-                    <div className="bg-[#F5F5F5] w-full  px-5 py-3 rounded-lg">
+                    <div className={cn("bg-[#F5F5F5] w-full  px-5 py-3 rounded-lg")}>
                         <div className="flex justify-between text-[10px] font-normal leading-3 text-[#999999]">
                             <span>Total Rewards</span>
+                            {isFetchingUserInfo && <FaSpinner className="animate-spin" />}
                             <span>Extra Boost</span>
                         </div>
                         <div className="flex justify-between font-bold leading-5 text-5 mt-[10px]">

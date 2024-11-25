@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect } from "react";
+import { toast } from "sonner";
 
 import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
@@ -12,10 +13,12 @@ import { User } from "~libs/user";
 interface AuthContextProps {
     userInfo?: User;
     logoutUser: () => Promise<void>;
+    isFetchingUserInfo: boolean;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
     logoutUser: async () => {},
+    isFetchingUserInfo: false,
 });
 
 interface AuthProviderProps {
@@ -35,11 +38,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (userInfo) genNodeId(userInfo);
     }, [userInfo]);
 
-    useQuery({
+    const { isFetching: isFetchingUserInfo } = useQuery({
         queryKey: ["queryUserInfo", accessToken],
         enabled: !!accessToken,
         refetchInterval: 60 * 1000 * 2,
         queryFn: async () => {
+            // toast.info("Refresh user info")
             const res = await Api.get<RES<User>>("/api/user/profile");
             setUserInfo(res.data.data);
             return res.data.data;
@@ -49,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         <AuthContext.Provider
             value={{
                 userInfo: accessToken ? userInfo : undefined,
+                isFetchingUserInfo,
                 logoutUser,
             }}
         >
