@@ -16,7 +16,7 @@ export async function genNodeId(user: User) {
             const { visitorId } = await fjs.get();
             console.info("vId:", visitorId, user.id);
             const nodeId = uuid(visitorId + user.id, "a40cbc48-a743-11ef-9781-325096b39f47");
-            console.info("nodeId:", nodeId, visitorId, user.id);
+            console.info("genNodeId:", nodeId, visitorId, user.id);
             nodeID = { uid: user.id, nodeId };
             storage.set(KEYS.NODE_ID, nodeID);
             return;

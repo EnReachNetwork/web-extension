@@ -1,11 +1,3 @@
-
-export const ROUTES = {
-    HOME: "/",
-    LOGIN: "/login",
-    FORGOT_PASSWORD: "/forgot-password",
-    DASHBOARD: "/dashboard",
-};
-
 export const KEYS = {
     ACCESS_TOKEN: "accessToken",
     USER_INFO: "userInfo",
@@ -14,6 +6,7 @@ export const KEYS = {
     IP_DATA: "ipData",
     NODE_ID: "nodeID",
     USER_LOGOUT: "userLogout",
+    IP_FROM_WS: "ipFromWS",
 };
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];

@@ -1,6 +1,5 @@
 import "@plasmohq/messaging/background";
 
-
 import { KEYS } from "~constants";
 import { getIP } from "~libs/getIp";
 import { storage } from "~libs/mstorage";
@@ -10,12 +9,14 @@ import { runLoop } from "~libs/utils";
 
 import { closeLast, connect } from "./ws";
 
+let lastNodeId: NodeID = null;
 const connectByAuthUser = async () => {
     const auth = await storage.get(KEYS.ACCESS_TOKEN);
     const user = await storage.get<User>(KEYS.USER_INFO);
     const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
     const ipData = await storage.get<IPData>(KEYS.IP_DATA);
-    console.info("nodeId", nodeId);
+    if (!lastNodeId || lastNodeId.nodeId !== nodeId?.nodeId || lastNodeId.uid !== lastNodeId?.uid) console.info("nodeId", nodeId);
+    lastNodeId = nodeId;
     auth && user && nodeId && ipData && ipData.ipType == "IPv4" && connect(auth, user, nodeId, ipData);
 };
 
@@ -30,11 +31,13 @@ async function main() {
             !Boolean(e.newValue) && closeLast();
         },
     });
+    let lastIpData: IPData = null;
     runLoop(
         "checkIP",
         async () => {
             await getIP().then((ipdata) => {
-                console.info("ipdata:", ipdata);
+                if (!lastIpData || lastIpData.ipString !== ipdata.ipString) console.info("ipdata:", ipdata);
+                lastIpData = ipdata;
                 storage.set(KEYS.IP_DATA, ipdata);
             });
         },

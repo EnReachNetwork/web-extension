@@ -26,6 +26,8 @@ function HomeUI(p: { onClickUser: MouseEventHandler<any> }) {
 function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const ac = useAuthContext();
     const [ip] = useLocalStorage<IPData>(KEYS.IP_DATA);
+    const [ipFromWs] = useLocalStorage<string>(KEYS.IP_FROM_WS);
+    const nodeIP = ipFromWs || ip?.ipType == "IPv4" ? ip?.ipString : "-";
     return (
         <div className="flex flex-col items-center w-full h-full gap-[10px]">
             <div className="flex items-center justify-between w-full">
@@ -37,10 +39,10 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
             <span>{ac.userInfo?.email || ""}</span>
             <div className="flex flex-col gap-[10px] w-full px-[25px] mt-2.5">
                 <div className="bg-[#F5F5F5] w-full flex px-5 py-3 rounded-lg justify-between">
-                    <span className="text-[#000000]">Node IP：</span>
-                    <span className="text-sm text-[#999999]">{ip?.ipType == "IPv4" ? ip?.ipString : "-"}</span>
+                    <span className="text-[#000000]">Node IP: </span>
+                    <span className="text-sm text-[#999999]">{nodeIP}</span>
                 </div>
-                <button className="text-base font-medium btn " onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
+                <button className="text-base font-medium btn" onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
                     About EnReach
                 </button>
                 <div className="px-6 flex items-center justify-between">
@@ -51,7 +53,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                             onClick={() =>
                                 chrome.tabs.create({
                                     url: encodeURI(
-                                        "https://x.com/intent/follow?original_referer=wand.fi&ref_src=twsrc^tfw|twcamp^buttonembed|twterm^follow|twgr^WandProtocol&screen_name=EnReachAI",
+                                        "https://x.com/intent/follow?original_referer=enreach.network&ref_src=twsrc^tfw|twcamp^buttonembed|twterm^follow|twgr^WandProtocol&screen_name=EnReachAI",
                                     ),
                                 })
                             }
