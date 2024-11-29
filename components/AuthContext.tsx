@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import _ from "lodash";
 import React, { createContext, useContext, useEffect } from "react";
-import { toast } from "sonner";
 
 import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
@@ -29,9 +29,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [accessToken, setAccessToken] = useLocalStorage<string>(KEYS.ACCESS_TOKEN, "");
     const [userInfo, setUserInfo] = useLocalStorage<User>(KEYS.USER_INFO);
     const logoutUser = async () => {
-        setAccessToken();
-        setUserInfo();
+        setUserInfo()
+        setAccessToken()
         storage.set(KEYS.USER_LOGOUT, true);
+        storage.removeMany(_.values(KEYS).filter((item) => item !== KEYS.USER_LOGOUT));
     };
     configAuth(accessToken);
     useEffect(() => {

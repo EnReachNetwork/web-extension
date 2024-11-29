@@ -27,7 +27,7 @@ async function main() {
         [KEYS.NODE_ID]: connectByAuthUser,
         [KEYS.IP_DATA]: connectByAuthUser,
         [KEYS.ACCESS_TOKEN]: (e) => {
-            console.info("do close last connect", !Boolean(e.newValue));
+             console.info("do close last connect", !Boolean(e.newValue));
             !Boolean(e.newValue) && closeLast();
         },
     });

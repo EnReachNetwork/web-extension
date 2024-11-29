@@ -32,6 +32,9 @@ export async function getIP() {
             console.error("getIP", i, error);
         }
         i++;
-        if (i >= funcs.length) i = 0;
+        if (i >= funcs.length) {
+            await new Promise((reslove) => setTimeout(reslove, 5000));
+            i = 0;
+        }
     }
 }
