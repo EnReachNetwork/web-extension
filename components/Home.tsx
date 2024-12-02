@@ -1,11 +1,11 @@
 import Avatar from "boring-avatars";
 import React, { MouseEventHandler, useState } from "react";
+import { FaDiscord, FaXTwitter } from "react-icons/fa6";
 import { FiChevronLeft, FiLogOut } from "react-icons/fi";
-import discord from "url:~assets/IconDiscord.png";
-import x from "url:~assets/IconX.png";
 
 import { HOME_BASE, KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
+import { goToFollowX, goToJoinDiscord } from "~libs/handlers";
 import { IPData } from "~libs/type";
 
 import { useAuthContext } from "./AuthContext";
@@ -45,31 +45,13 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                 <button className="text-base font-medium btn" onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
                     About EnReach
                 </button>
-                <div className="px-6 flex items-center justify-between">
+                <div className="px-6 flex items-center justify-between text-base">
                     <div className="flex items-center gap-[15px]">
-                        <img
-                            src={x}
-                            className="cursor-pointer"
-                            onClick={() =>
-                                chrome.tabs.create({
-                                    url: encodeURI(
-                                        "https://x.com/intent/follow?original_referer=enreach.network&ref_src=twsrc^tfw|twcamp^buttonembed|twterm^follow|twgr^WandProtocol&screen_name=EnReachAI",
-                                    ),
-                                })
-                            }
-                        />
-                        <img
-                            src={discord}
-                            className="cursor-pointer"
-                            onClick={() =>
-                                chrome.tabs.create({
-                                    url: encodeURI("https://discord.com/invite/XbWKu397"),
-                                })
-                            }
-                        />
+                        <FaXTwitter className="cursor-pointer hover:text-primary" onClick={goToFollowX} />
+                        <FaDiscord className="cursor-pointer hover:text-primary" onClick={() => goToJoinDiscord} />
                     </div>
                     <span
-                        className="text-base cursor-pointer"
+                        className="cursor-pointer hover:text-primary"
                         onClick={() => {
                             ac.logoutUser();
                         }}
