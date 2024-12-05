@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { io, Socket } from "socket.io-client";
 
 import { WSURL } from "~constants";
@@ -19,7 +20,7 @@ export function closeLast() {
     setIpFromWS();
 }
 export function connect(token: string, user: User, nodeId: NodeID, ipData: IPData) {
-    if (lastSocket.socket && lastSocket.socket.id && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
+    if (lastSocket.socket && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
         return;
     }
     closeLast();
@@ -27,6 +28,8 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     const socket = io(WSURL, {
         transports: ["websocket"],
         auth: { token: authToken },
+        reconnectionDelay: 5000,
+        reconnectionDelayMax: 10000,
     });
     lastSocket.socket = socket;
     lastSocket.uid = user.id;
@@ -38,6 +41,10 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
+    });
+    socket.io.on("reconnect_attempt", (data) => {
+        setConnectError()
+        console.info("doReconnect:", data);
     });
     // fot test delay
     socket.on("ping", ({ id }) => {
@@ -70,7 +77,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     });
     socket.on("connect_error", (e) => {
         // will auto connect
-        console.error("socket:", e);
+        console.error("socket:", e.message);
         // set connect
         setConnectStatus("connecting");
         setConnectError(e.message);
@@ -83,6 +90,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
             // close
             closeLast();
         }
+        setConnectError(reason);
     });
     try {
         (global as any).getEnreachState = () => ({ active: socket.active, id: socket.id });

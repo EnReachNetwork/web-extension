@@ -7,7 +7,7 @@ import { FiCheck } from "react-icons/fi";
 import { useCopy } from "~hooks/useCopy";
 import useLocalStorage from "~hooks/useLocalStorage";
 import Api from "~libs/apis";
-import { IPData, NodeID, RES } from "~libs/type";
+import { NodeID, RES } from "~libs/type";
 import { cn } from "~libs/utils";
 
 import { DashboardBase, KEYS, levels, StatusConnect } from "../constants";
@@ -26,22 +26,23 @@ export const Connection: React.FC = () => {
     const startLevel = levels[endLevel.level - 1];
     const currentProcess = Math.floor((exp * 100) / endLevel.exp);
     const [nodeID] = useLocalStorage<NodeID>(KEYS.NODE_ID);
-    const [ipData] = useLocalStorage<IPData>(KEYS.IP_DATA);
+    const [ipFromWS] = useLocalStorage<string>(KEYS.IP_FROM_WS);
     const { data: netQuality, isFetching: isFetchingNetQuality } = useQuery({
-        queryKey: ["NetworkQuality", nodeID, ipData?.ipString],
-        enabled: status == "connected" && Boolean(nodeID) && Boolean(ipData) && Boolean(ipData.ipString),
+        queryKey: ["NetworkQuality", nodeID, ipFromWS],
+        enabled: status == "connected" && Boolean(nodeID) && Boolean(ipFromWS),
         refetchInterval: 1000 * 60 * 2,
         retry: true,
         retryDelay: 5000,
         refetchIntervalInBackground: true,
         queryFn: async () => {
-            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID}/${encodeURIComponent(ipData.ipString)}/reward`);
+            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID}/${encodeURIComponent(ipFromWS)}/reward`);
             return fmtNetqulity(res.data.data.lastReward);
         },
     });
     const total = _.toNumber(userInfo?.point.total || 0);
     const boost = fmtBoost(userInfo?.stat.extraBoost);
     const mTotal = fmtBerry(total * boost);
+    const [connectError] = useLocalStorage(KEYS.CONNECT_ERROR);
 
     return (
         <div className="flex flex-col items-center w-full flex-1 px-[25px] gap-[10px]">
@@ -52,8 +53,12 @@ export const Connection: React.FC = () => {
                     <FiCheck className="inline-block ml-1 text-green-500" />
                 </p>
             ) : (
-                <p className="text-center text-xs">Connecting...</p>
+                <>
+                    <p className="text-center text-xs">Connecting...</p>
+                    {Boolean(connectError) && <p className="text-center text-xs text-red-400 mt-8">There seems to be a network issue, please check your internet connectivity.</p>}
+                </>
             )}
+
             {status === "connected" && (
                 <>
                     <div className="flex bg-[#F5F5F5] w-full items-center justify-between px-5 py-3 text-sm rounded-lg">
