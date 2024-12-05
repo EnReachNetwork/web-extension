@@ -15,3 +15,11 @@ export async function setIpFromWS(ip?: string) {
         await storage.remove(KEYS.IP_FROM_WS);
     }
 }
+
+export async function setConnectError(err?: string) {
+    if (err) {
+        await storage.set(KEYS.CONNECT_ERROR, err);
+    } else {
+        await storage.remove(KEYS.CONNECT_ERROR);
+    }
+}

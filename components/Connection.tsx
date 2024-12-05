@@ -3,8 +3,6 @@ import _ from "lodash";
 import React from "react";
 import { FaSpinner } from "react-icons/fa6";
 import { FiCheck } from "react-icons/fi";
-import berry from "url:~assets/IconBerry.png";
-import rocket from "url:~assets/IconRocket.png";
 
 import { useCopy } from "~hooks/useCopy";
 import useLocalStorage from "~hooks/useLocalStorage";
@@ -16,10 +14,12 @@ import { DashboardBase, KEYS, levels, StatusConnect } from "../constants";
 import { useAuthContext } from "./AuthContext";
 import ConAnim from "./ConAnim";
 import { fmtBerry, fmtBoost, fmtNetqulity } from "./fmtData";
+import { Berry, Exp, Rocket } from "./svgs/icons";
 
 export const Connection: React.FC = () => {
     const { userInfo, logoutUser, isFetchingUserInfo } = useAuthContext();
     const [status] = useLocalStorage<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
+    // const status = 'connected'
     const copy = useCopy();
     const exp = userInfo?.stat?.exp || 0;
     const endLevel = levels.find((l) => l.exp > exp) || levels[levels.length - 1];
@@ -28,14 +28,14 @@ export const Connection: React.FC = () => {
     const [nodeID] = useLocalStorage<NodeID>(KEYS.NODE_ID);
     const [ipData] = useLocalStorage<IPData>(KEYS.IP_DATA);
     const { data: netQuality, isFetching: isFetchingNetQuality } = useQuery({
-        queryKey: ["NetworkQuality", nodeID?.nodeId, ipData?.ipString],
-        enabled: status == "connected" && Boolean(nodeID) && Boolean(ipData) && Boolean(ipData.ipString) && ipData.ipType == "IPv4",
+        queryKey: ["NetworkQuality", nodeID, ipData?.ipString],
+        enabled: status == "connected" && Boolean(nodeID) && Boolean(ipData) && Boolean(ipData.ipString),
         refetchInterval: 1000 * 60 * 2,
         retry: true,
         retryDelay: 5000,
         refetchIntervalInBackground: true,
         queryFn: async () => {
-            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID.nodeId}/${encodeURIComponent(ipData.ipString)}/reward`);
+            const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID}/${encodeURIComponent(ipData.ipString)}/reward`);
             return fmtNetqulity(res.data.data.lastReward);
         },
     });
@@ -70,15 +70,15 @@ export const Connection: React.FC = () => {
                         <div className="flex justify-between font-bold leading-5 text-5 mt-[10px]">
                             <div className="flex items-center gap-[10px]">
                                 <span className="">{mTotal}</span>
-                                <img src={berry} alt="berry" />
+                                <Berry className="text-base" />
                             </div>
                             <div className="flex items-center gap-[10px]">
                                 <span className="">{boost}x</span>
-                                <img src={rocket} alt="rocket" />
+                                <Rocket className="text-base" />
                             </div>
                         </div>
 
-                        <div className="flex justify-between text-[10px] font-normal leading-3 text-[#999999] mt-5">
+                        <div className="flex justify-between text-[10px] font-normal leading-3 text-black mt-5">
                             <span>{startLevel.name}</span>
                             <span>{endLevel.name}</span>
                         </div>
@@ -90,7 +90,7 @@ export const Connection: React.FC = () => {
                                 <span className="">
                                     {exp}/{endLevel.exp}
                                 </span>
-                                <span className="font-medium text-[10px] ">EXP</span>
+                                <Exp />
                             </div>
                         </div>
                     </div>

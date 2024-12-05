@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import _ from "lodash";
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 
 import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
@@ -25,6 +25,8 @@ interface AuthProviderProps {
     children: React.ReactNode;
 }
 
+genNodeId()
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [accessToken, setAccessToken] = useLocalStorage<string>(KEYS.ACCESS_TOKEN, "");
     const [userInfo, setUserInfo] = useLocalStorage<User>(KEYS.USER_INFO);
@@ -32,12 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUserInfo()
         setAccessToken()
         storage.set(KEYS.USER_LOGOUT, true);
-        storage.removeMany(_.values(KEYS).filter((item) => item !== KEYS.USER_LOGOUT));
+        const unClearKeys = [KEYS.USER_LOGOUT, KEYS.NODE_ID]
+        storage.removeMany(_.values(KEYS).filter((item) => !unClearKeys.includes(item)));
     };
     configAuth(accessToken);
-    useEffect(() => {
-        if (userInfo) genNodeId(userInfo);
-    }, [userInfo]);
 
     const { isFetching: isFetchingUserInfo } = useQuery({
         queryKey: ["queryUserInfo", accessToken],

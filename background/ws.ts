@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 import { WSURL } from "~constants";
-import { setConnectStatus, setIpFromWS } from "~libs/mstorage";
+import { setConnectError, setConnectStatus, setIpFromWS } from "~libs/mstorage";
 import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
@@ -19,24 +19,25 @@ export function closeLast() {
     setIpFromWS();
 }
 export function connect(token: string, user: User, nodeId: NodeID, ipData: IPData) {
-    if (lastSocket.socket && lastSocket.socket.id && user.id === lastSocket.uid && nodeId.nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
+    if (lastSocket.socket && lastSocket.socket.id && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
         return;
     }
     closeLast();
+    const authToken = { userId: user.id, nodeId: nodeId };
     const socket = io(WSURL, {
         transports: ["websocket"],
+        auth: { token: authToken },
     });
     lastSocket.socket = socket;
     lastSocket.uid = user.id;
-    lastSocket.nodeId = nodeId.nodeId;
+    lastSocket.nodeId = nodeId;
     lastSocket.ip = ipData.ipString;
     // set connecting
     setConnectStatus("connecting");
+    setConnectError();
     console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
-        // for connect
-        socket.volatile.emit("auth", { userId: user.id, nodeId: nodeId.nodeId });
     });
     // fot test delay
     socket.on("ping", ({ id }) => {
@@ -54,13 +55,14 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
             setIpFromWS(ip);
             // set connected
             setConnectStatus("connected");
+            setConnectError();
             // clear last pingTask for  auto connected
             if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
             // for uptime
             lastSocket.pingTask = setInterval(
                 () => {
                     console.info("do ping to server");
-                    socket.volatile.emit("ping", { userId: user.id, nodeId: nodeId.nodeId });
+                    socket.volatile.emit("ping", authToken);
                 },
                 1000 * 60 * 3,
             );
@@ -71,6 +73,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
         console.error("socket:", e);
         // set connect
         setConnectStatus("connecting");
+        setConnectError(e.message);
         if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
         lastSocket.pingTask = null;
     });

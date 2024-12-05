@@ -9,15 +9,12 @@ import { runLoop } from "~libs/utils";
 
 import { closeLast, connect } from "./ws";
 
-let lastNodeId: NodeID = null;
 const connectByAuthUser = async () => {
     const auth = await storage.get(KEYS.ACCESS_TOKEN);
     const user = await storage.get<User>(KEYS.USER_INFO);
     const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
     const ipData = await storage.get<IPData>(KEYS.IP_DATA);
-    if (!lastNodeId || lastNodeId.nodeId !== nodeId?.nodeId || lastNodeId.uid !== lastNodeId?.uid) console.info("nodeId", nodeId);
-    lastNodeId = nodeId;
-    auth && user && nodeId && ipData && ipData.ipType == "IPv4" && connect(auth, user, nodeId, ipData);
+    auth && user && nodeId && ipData && connect(auth, user, nodeId, ipData);
 };
 
 async function main() {
