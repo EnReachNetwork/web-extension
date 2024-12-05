@@ -23,6 +23,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     if (lastSocket.socket && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
         return;
     }
+    
     closeLast();
     const authToken = { userId: user.id, nodeId: nodeId };
     const socket = io(WSURL, {
@@ -37,13 +38,11 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     lastSocket.ip = ipData.ipString;
     // set connecting
     setConnectStatus("connecting");
-    setConnectError();
     console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
     });
     socket.io.on("reconnect_attempt", (data) => {
-        setConnectError()
         console.info("doReconnect:", data);
     });
     // fot test delay
