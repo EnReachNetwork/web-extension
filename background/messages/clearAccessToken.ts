@@ -1,10 +1,10 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 
-import { storage } from "~libs/mstorage";
+import { clearForLogout } from "~libs/mstorage";
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     console.info("on clearAccessToken", req);
-    await storage.removeAll()
+    await clearForLogout();
     res.send({ status: "success" });
 };
 

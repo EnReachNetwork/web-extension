@@ -14,6 +14,7 @@ const connectByAuthUser = async () => {
     const user = await storage.get<User>(KEYS.USER_INFO);
     const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
     const ipData = await storage.get<IPData>(KEYS.IP_DATA);
+    console.info("connectIf", Boolean(auth), Boolean(user), Boolean(nodeId), Boolean(ipData));
     auth && user && nodeId && ipData && connect(auth, user, nodeId, ipData);
 };
 
@@ -43,6 +44,8 @@ async function main() {
         },
         10000,
     );
+    
+    chrome.action.openPopup();
 }
 
 main().catch(console.error);

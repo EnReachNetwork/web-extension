@@ -6,7 +6,7 @@ import { KEYS } from "~constants";
 import useLocalStorage from "~hooks/useLocalStorage";
 import Api, { configAuth } from "~libs/apis";
 import { genNodeId } from "~libs/genNodeId";
-import { storage } from "~libs/mstorage";
+import { clearForLogout, storage } from "~libs/mstorage";
 import { RES } from "~libs/type";
 import { User } from "~libs/user";
 
@@ -31,11 +31,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [accessToken, setAccessToken] = useLocalStorage<string>(KEYS.ACCESS_TOKEN, "");
     const [userInfo, setUserInfo] = useLocalStorage<User>(KEYS.USER_INFO);
     const logoutUser = async () => {
-        setUserInfo()
-        setAccessToken()
         storage.set(KEYS.USER_LOGOUT, true);
-        const unClearKeys = [KEYS.USER_LOGOUT, KEYS.NODE_ID]
-        storage.removeMany(_.values(KEYS).filter((item) => !unClearKeys.includes(item)));
+        clearForLogout()
     };
     configAuth(accessToken);
 

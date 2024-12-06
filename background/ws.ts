@@ -18,6 +18,7 @@ export function closeLast() {
         lastSocket.pingTask = null;
     }
     setIpFromWS();
+    console.info("closeLast")
 }
 export function connect(token: string, user: User, nodeId: NodeID, ipData: IPData) {
     if (lastSocket.socket && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {

@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 import { Storage } from "@plasmohq/storage";
 
 import { KEYS, StatusConnect } from "~constants";
@@ -22,4 +24,9 @@ export async function setConnectError(err?: string) {
     } else {
         await storage.remove(KEYS.CONNECT_ERROR);
     }
+}
+
+export async function clearForLogout() {
+    const unClearKeys = [KEYS.USER_LOGOUT, KEYS.NODE_ID];
+    await storage.removeMany(_.values(KEYS).filter((item) => !unClearKeys.includes(item)));
 }
