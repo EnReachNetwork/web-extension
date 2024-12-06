@@ -24,7 +24,7 @@ async function main() {
         [KEYS.NODE_ID]: connectByAuthUser,
         [KEYS.IP_DATA]: connectByAuthUser,
         [KEYS.ACCESS_TOKEN]: (e) => {
-             console.info("do close last connect", !Boolean(e.newValue));
+            console.info("do close last connect", !Boolean(e.newValue));
             !Boolean(e.newValue) && closeLast();
         },
     });
@@ -32,11 +32,14 @@ async function main() {
     runLoop(
         "checkIP",
         async () => {
-            await getIP().then((ipdata) => {
-                if (!lastIpData || lastIpData.ipString !== ipdata.ipString) console.info("ipdata:", ipdata);
-                lastIpData = ipdata;
-                storage.set(KEYS.IP_DATA, ipdata);
-            });
+            await getIP()
+                .then((ipdata) => {
+                    if (!lastIpData || lastIpData.ipString !== ipdata.ipString) console.info("ipdata:", ipdata);
+                    lastIpData = ipdata;
+                    return storage.set(KEYS.IP_DATA, ipdata);
+                })
+                .catch(console.error)
+                .finally(connectByAuthUser);
         },
         10000,
     );

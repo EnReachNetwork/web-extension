@@ -23,7 +23,6 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     if (lastSocket.socket && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
         return;
     }
-    
     closeLast();
     const authToken = { userId: user.id, nodeId: nodeId };
     const socket = io(WSURL, {
@@ -38,6 +37,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     lastSocket.ip = ipData.ipString;
     // set connecting
     setConnectStatus("connecting");
+    setConnectError();
     console.info("doConnect", user.id, nodeId);
     socket.on("connect", () => {
         console.info("connected:", socket.id);
@@ -82,6 +82,10 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
         setConnectError(e.message);
         if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
         lastSocket.pingTask = null;
+        const msg = e.message;
+        if (typeof msg === 'string' && msg.startsWith("invalid ip address:") || ["invalid userId", "server err", "invalid auth token"].includes(msg)) {
+            closeLast();
+        }
     });
     socket.on("disconnect", (reason) => {
         console.info("disconnect", user.id, reason);
