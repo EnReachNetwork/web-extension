@@ -23,7 +23,7 @@ async function updateUserInfo() {
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     console.info("on setAccessToken", req);
     const auth = req.body as string;
-    storage.set(KEYS.ACCESS_TOKEN, auth);
+    await storage.set(KEYS.ACCESS_TOKEN, auth);
     configAuth(auth);
     await updateUserInfo();
     res.send({ status: "success" });

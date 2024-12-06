@@ -7,7 +7,10 @@ import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
 const lastSocket: { socket?: Socket; uid?: string; pingTask?: NodeJS.Timeout; nodeId?: string; ip?: string } = {};
-export function closeLast() {
+export function closeLast(socket?: Socket) {
+    if (socket && socket !== lastSocket.socket) {
+        return socket.close();
+    }
     setConnectStatus("idle");
     if (lastSocket.socket) {
         lastSocket.socket.disconnect();
@@ -18,7 +21,7 @@ export function closeLast() {
         lastSocket.pingTask = null;
     }
     setIpFromWS();
-    console.info("closeLast")
+    console.info("closeLast");
 }
 export function connect(token: string, user: User, nodeId: NodeID, ipData: IPData) {
     if (lastSocket.socket && user.id === lastSocket.uid && nodeId === lastSocket.nodeId && ipData.ipString === lastSocket.ip) {
@@ -84,15 +87,15 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
         if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
         lastSocket.pingTask = null;
         const msg = e.message;
-        if (typeof msg === 'string' && msg.startsWith("invalid ip address:") || ["invalid userId", "server err", "invalid auth token"].includes(msg)) {
-            closeLast();
+        if ((typeof msg === "string" && msg.startsWith("invalid ip address:")) || ["invalid userId", "server err", "invalid auth token"].includes(msg)) {
+            closeLast(socket);
         }
     });
     socket.on("disconnect", (reason) => {
         console.info("disconnect", user.id, reason);
         if (reason == "io server disconnect") {
             // close
-            closeLast();
+            closeLast(socket);
         }
         setConnectError(reason);
     });
