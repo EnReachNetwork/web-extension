@@ -51,7 +51,7 @@ export function ConAnim(p: { status: StatusConnect; onClick?: MouseEventHandler<
     );
 }
 
-export function NetworkQulityAnim(p: { netQulityDeg: string }) {
+export function NetworkQulityAnim(p: { netQulityDeg?: string }) {
     return (
         <div className="relative">
             <svg width="192" height="97" viewBox="0 0 192 97" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,6 +109,7 @@ export function NetworkQulityAnim(p: { netQulityDeg: string }) {
                 style={{
                     transition: "all ease 1s",
                     transformOrigin: "right center",
+                    visibility: !p.netQulityDeg ? "hidden" : "visible",
                     transform: `rotate(${p.netQulityDeg})`,
                 }}
                 width="66"

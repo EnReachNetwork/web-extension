@@ -32,7 +32,7 @@ export const Login = () => {
                     <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={handleRegister}>
                         sign up
                     </div>
-                    with email
+                    with email.
                 </div>
             </div>
         </div>

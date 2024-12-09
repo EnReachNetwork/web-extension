@@ -24,6 +24,7 @@ import { Berry, Exp, Rocket } from "./svgs/icons";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
     const [connectError] = useLocalStorage(KEYS.CONNECT_ERROR);
+    // const [connectError] = useLocalStorage(KEYS.CONNECT_ERROR,'err');
     return (
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
@@ -32,10 +33,10 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
             </div>
             {/* <div className="font-medium text-white text-center text-[15px] my-auto ">Connecting...</div> */}
             <div className="loading"></div>
-            <GoToDashboard className="mb-[11px]"/>
+            <GoToDashboard className="mb-[11px]" />
             {Boolean(connectError) && (
-                <p className="text-left flex items-start gap-1 p-3 text-xs bg-[#E36B6B] absolute left-0 bottom-0 rounded-t-[30px] w-full">
-                    <FiAlertCircle className="text-base" />
+                <p className="text-left flex items-start gap-1 p-3 text-xs bg-primary absolute left-0 bottom-0 rounded-t-[30px] w-full">
+                    <FiAlertCircle className="text-base " />
                     There seems to be a network issue, please check your internet connectivity.
                 </p>
             )}
@@ -78,7 +79,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 <div className="border border-[#C0C0C0] w-full h-full rounded-full">
                 </div>
             </div> */}
-            <Avatar name={userInfo?.email} size={44} className="cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
+            <Avatar name={userInfo?.email} size={40} className="cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
             <div className="flex flex-col gap-2 w-full items-center mt-[30px]">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
                 <span className="font-semibold text-sm text-center">Network Quality</span>
@@ -89,19 +90,20 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
             </div>
 
             <div className={cn("bg-[#595959] w-full p-4 rounded-[25px]")}>
-                <div className="flex justify-between text-[10px] font-semibold leading-3 text-[#999999]">
-                    <span>Total Rewards</span>
-                    {isFetchingUserInfo && <FaSpinner className="animate-spin" />}
-                    <span>Extra Boost</span>
-                </div>
-                <div className="flex justify-between font-bold text-[20px] leading-none mt-[10px]">
-                    <div className="flex items-center gap-[10px]">
-                        <span className="">{mTotal}</span>
-                        <Berry className="text-base" />
+                <div className="flex justify-between  leading-3 ">
+                    <div>
+                        <span className="font-semibold text-[10px] text-[#999999]">Total Rewards</span>
+                        <div className="flex items-center mt-1 gap-[10px]">
+                            <span className="font-bold text-xl">{mTotal}</span>
+                            <Berry className="text-base" />
+                        </div>
                     </div>
-                    <div className="flex items-center gap-[10px]">
-                        <span className="">{boost}x</span>
-                        <Rocket className="text-base" />
+                    <div>
+                        <span className="font-semibold text-[10px] text-[#999999]">Extra Boost</span>
+                        <div className="flex items-center mt-1 gap-0.5">
+                            <span className="font-bold text-xl">{boost}x</span>
+                            <Rocket className="text-xl mt-[3px]" />
+                        </div>
                     </div>
                 </div>
                 <div className="w-full h-[19px] mt-5 relative rounded-full overflow-hidden">
@@ -116,7 +118,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 </div>
             </div>
             <div className="flex items-center justify-center gap-1">
-                <button className="text-sm font-medium btn2 w-[129px]" onClick={onCopyReferral}>
+                <button className="text-sm font-medium btn2 w-[129px]">
                     Referral Link
                 </button>
                 <div className="w-[41px] h-[41px] rounded-full bg-primary flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
