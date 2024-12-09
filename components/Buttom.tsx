@@ -11,8 +11,11 @@ export function GoToDashboard({ className }: { className?: string }) {
     };
 
     return (
-        <div className={cn(` text-center text-[#8A8A8A] cursor-pointer text-sm flex items-center gap-2.5 p-[5px] hover:text-primary`, className)} onClick={handleDashboard}>
-            Go to Mining Dashboard <FaSquareArrowUpRight className="text-base"/>
+        <div
+            className={cn(`select-none text-center text-[#8A8A8A] cursor-pointer text-sm flex items-center gap-2.5 p-[5px] hover:text-primary`, className)}
+            onClick={handleDashboard}
+        >
+            Go to Mining Dashboard <FaSquareArrowUpRight className="text-base" />
         </div>
     );
 }

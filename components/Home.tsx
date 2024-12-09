@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import _ from "lodash";
 import React, { MouseEventHandler, useEffect, useState } from "react";
-import { FaSpinner } from "react-icons/fa6";
-import { FiAlertCircle, FiChevronLeft, FiCopy, FiLogOut } from "react-icons/fi";
+import { FiAlertCircle, FiChevronLeft, FiLogOut } from "react-icons/fi";
 import { PiCopySimple } from "react-icons/pi";
 import { RiDiscordLine, RiTwitterXLine } from "react-icons/ri";
 
@@ -12,14 +11,14 @@ import { useCopy } from "~hooks/useCopy";
 import useLocalStorage from "~hooks/useLocalStorage";
 import Api from "~libs/apis";
 import { goToFollowX, goToJoinDiscord } from "~libs/handlers";
-import { connectingGif, imgLogo } from "~libs/imgs";
+import { imgLogo } from "~libs/imgs";
 import { IPData, NodeID, RES } from "~libs/type";
 import { cn } from "~libs/utils";
 
-import { NetworkQulityAnim } from "./Anims";
+import { ConnectingAnim, NetworkQulityAnim } from "./Anims";
 import { useAuthContext } from "./AuthContext";
 import { GoToDashboard } from "./Buttom";
-import { fmtBerry, fmtBoost, fmtNetqulity, fmtNetqulityDeg } from "./fmtData";
+import { fmtBerry, fmtBoost, fmtNetqulityDeg } from "./fmtData";
 import { Berry, Exp, Rocket } from "./svgs/icons";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
@@ -29,7 +28,8 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
                 <img src={imgLogo} className="h-[60px] translate-x-4 -translate-y-5" alt={"logo"} />
-                <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" />
+                <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3"/>
+                {/* <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" /> */}
             </div>
             {/* <div className="font-medium text-white text-center text-[15px] my-auto ">Connecting...</div> */}
             <div className="loading"></div>
