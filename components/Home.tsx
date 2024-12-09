@@ -28,11 +28,13 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
                 <img src={imgLogo} className="h-[60px] translate-x-4 -translate-y-5" alt={"logo"} />
-                <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3"/>
+                <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3" />
                 {/* <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" /> */}
             </div>
             {/* <div className="font-medium text-white text-center text-[15px] my-auto ">Connecting...</div> */}
-            <div className="loading"></div>
+            <div className="font-medium text-white text-center text-[15px my-auto flex items-end gap-2">
+                Connecting<div className="loading -translate-y-1"></div>
+            </div>
             <GoToDashboard className="mb-[11px]" />
             {Boolean(connectError) && (
                 <p className="text-left flex items-start gap-1 p-3 text-xs bg-primary absolute left-0 bottom-0 rounded-t-[30px] w-full">
@@ -118,9 +120,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 </div>
             </div>
             <div className="flex items-center justify-center gap-1">
-                <button className="text-sm font-medium btn2 w-[129px]">
-                    Referral Link
-                </button>
+                <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
                 <div className="w-[41px] h-[41px] rounded-full bg-primary flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
                     <PiCopySimple className="rotate-90 text-base" />
                 </div>
@@ -174,8 +174,8 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
 export const Home: React.FC = () => {
     const [showUser, setShowUser] = useState(false);
     const [status] = useLocalStorage<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
-    // const isConnected = false;
-    const isConnected = status === "connected";
+    const isConnected = false;
+    // const isConnected = status === "connected";
     const onClickUser = () => setShowUser(true);
     return showUser ? <UserUI onBack={() => setShowUser(false)} /> : isConnected ? <ConnectedUI onClickUser={onClickUser} /> : <ConnectingUI onClickUser={onClickUser} />;
 };
