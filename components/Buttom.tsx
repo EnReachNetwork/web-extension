@@ -1,5 +1,5 @@
 import React from "react";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FaSquareArrowUpRight } from "react-icons/fa6";
 
 import { DashboardBase } from "~constants";
 import { cn } from "~libs/utils";
@@ -11,8 +11,8 @@ export function GoToDashboard({ className }: { className?: string }) {
     };
 
     return (
-        <div className={cn(` text-center cursor-pointer text-sm flex items-center gap-2.5 p-[5px] mb-[30px] hover:text-primary`, className)} onClick={handleDashboard}>
-            Go to Mining Dashboard <FiArrowUpRight className="text-base"/>
+        <div className={cn(` text-center text-[#8A8A8A] cursor-pointer text-sm flex items-center gap-2.5 p-[5px] hover:text-primary`, className)} onClick={handleDashboard}>
+            Go to Mining Dashboard <FaSquareArrowUpRight className="text-base"/>
         </div>
     );
 }

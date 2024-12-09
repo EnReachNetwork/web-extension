@@ -1,7 +1,7 @@
 import React from "react";
 
 import { DashboardBase, KEYS } from "~constants";
-import { imgLogo } from "~libs/imgs";
+import { imgLogin, imgLogo } from "~libs/imgs";
 import { storage } from "~libs/mstorage";
 
 export const Login = () => {
@@ -17,17 +17,23 @@ export const Login = () => {
         chrome.tabs.create({ url: `${DashboardBase}/signup` });
     };
     return (
-        <div className="flex flex-col flex-1 w-full h-full p-[30px] logo_bg">
-            <img src={imgLogo} className="h-[95px] mt-[50px]" alt={"logo"} />
-            <button className="mt-auto btn" onClick={handleLogin}>
-                Sign In to EnReach
-            </button>
-            <div className="mt-[10px] text-xs flex justify-center items-center ">
-                Don't have an account? Go{" "}
-                <div className="mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={handleRegister}>
-                    sign up
+        <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center">
+            <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
+                <img src={imgLogo} className="h-[60px] translate-x-4 -translate-y-5" alt={"logo"} />
+                <img src={imgLogin} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" />
+            </div>
+            <div className="my-auto w-[170px]">
+                <button className="mt-auto btn" onClick={handleLogin}>
+                    Sign In
+                </button>
+                <div className="mt-[10px] text-xs text-[#8A8A8A] w-fit mx-auto text-center">
+                    Don't have an account?
+                    <br /> Go
+                    <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={handleRegister}>
+                        sign up
+                    </div>
+                    with email
                 </div>
-                with email
             </div>
         </div>
     );
