@@ -174,8 +174,8 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
 export const Home: React.FC = () => {
     const [showUser, setShowUser] = useState(false);
     const [status] = useLocalStorage<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
-    const isConnected = false;
-    // const isConnected = status === "connected";
+    // const isConnected = false;
+    const isConnected = status === "connected";
     const onClickUser = () => setShowUser(true);
     return showUser ? <UserUI onBack={() => setShowUser(false)} /> : isConnected ? <ConnectedUI onClickUser={onClickUser} /> : <ConnectingUI onClickUser={onClickUser} />;
 };
