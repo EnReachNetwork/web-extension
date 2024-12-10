@@ -574,7 +574,7 @@ export function NetworkQulityAnim(p: { netQulityDeg?: string }) {
                 style={{
                     transition: "all ease 1s",
                     transformOrigin: "right center",
-                    visibility: !p.netQulityDeg ? "hidden" : "visible",
+                    visibility: !p.netQulityDeg || p.netQulityDeg === '-' ? "hidden" : "visible",
                     transform: `rotate(${p.netQulityDeg})`,
                 }}
                 width="66"
