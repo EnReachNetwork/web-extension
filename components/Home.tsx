@@ -10,7 +10,7 @@ import { TbLogout } from "react-icons/tb";
 import { DashboardBase, HOME_BASE, KEYS, levels, StatusConnect } from "~constants";
 import { useCopy } from "~hooks/useCopy";
 import Api from "~libs/apis";
-import { goToFollowX, goToJoinDiscord, goToTelegram } from "~libs/handlers";
+import { goToFollowX, goToJoinDiscord, goToTelegram, goToGuide, goToWebsite } from "~libs/handlers";
 import { imgLogo } from "~libs/imgs";
 import { IPData, NodeID, RES } from "~libs/type";
 import { User } from "~libs/user";
@@ -183,10 +183,10 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                 </div>
             </div>
             <div className="flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
-                <div className={linkClassName} onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
+                <div className={linkClassName} onClick={goToWebsite}>
                     Website
                 </div>
-                <div className={linkClassName} onClick={() => chrome.tabs.create({ url: "" })}>
+                <div className={linkClassName} onClick={goToGuide}>
                     Guide
                 </div>
             </div>
