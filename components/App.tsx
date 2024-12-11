@@ -8,7 +8,7 @@ import { Providers } from "./Providers";
 
 function AppImpl() {
     const { userInfo } = useAuthContext();
-
+    // return <Login/>
     return userInfo ? <Home /> : <Login />;
 }
 export const App: React.FC = () => {

@@ -19,7 +19,7 @@ export const Login = () => {
     return (
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center">
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
-                <img src={imgLogo} className="h-[60px] translate-x-4 -translate-y-5" alt={"logo"} />
+                <img src={imgLogo} className="h-[29px] -translate-y-2" alt={"logo"} />
                 <img src={imgLogin} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" />
             </div>
             <div className="my-auto w-[170px]">

@@ -29,8 +29,8 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
     // const [connectError] = useStoreItem(KEYS.CONNECT_ERROR,'err');
     return (
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
-            <div className="w-full flex items-start justify-between">
-                <img src={imgLogo} className="h-[60px] -ml-[30px] mt-1 translate-x-4 -translate-y-5" alt={"logo"} />
+            <div className="w-full flex items-start justify-between mb-6">
+                <img src={imgLogo} className="h-[29px]" alt={"logo"} />
                 <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
             </div>
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
@@ -90,10 +90,6 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
 
     return (
         <div className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
-            {/* <div className="self-end border border-[#595959] w-[44px] h-[44px] rounded-full">
-                <div className="border border-[#C0C0C0] w-full h-full rounded-full">
-                </div>
-            </div> */}
             <Avatar name={userInfo?.email} size={40} className="cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
             <div className="flex flex-col gap-2 w-full items-center mt-[30px]">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
@@ -152,6 +148,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const copy = useCopy();
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
     const socialClassName = "flex justify-center items-center w-8 h-8 border border-white rounded-full cursor-pointer text-xl hover:text-primary hover:border-primary";
+    const linkClassName = "inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]";
     return (
         <div className="flex flex-col items-center w-full h-full gap-4">
             <div className="flex items-center justify-between w-full p-4">
@@ -165,8 +162,8 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
             <Avatar name={ac.userInfo?.email} size={50} className="mt-7" variant="marble" />
             <div className="items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
                 <div className="">{ac.userInfo?.email || ""}</div>
-                <div className="font-bold mt-2.5">Node IP</div>
-                <div className="">{nodeIP}</div>
+                <div className="font-bold mt-7">Node IP</div>
+                <div className="mt-2">{nodeIP}</div>
             </div>
             <div className="flex items-center justify-center gap-1 mt-6">
                 <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
@@ -186,10 +183,10 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                 </div>
             </div>
             <div className="flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
-                <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
+                <div className={linkClassName} onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
                     Website
                 </div>
-                <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={() => chrome.tabs.create({ url: "" })}>
+                <div className={linkClassName} onClick={() => chrome.tabs.create({ url: "" })}>
                     Guide
                 </div>
             </div>
