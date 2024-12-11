@@ -1,3 +1,12 @@
+export const ENV: "beta" | "staging" | "prod" = process.env.PLASMO_TAG === "dev" ? "beta" : (process.env.PLASMO_TAG as any) || "beta";
+export const ENVDataMap: {
+    [k in typeof ENV]: { dashboardBase: string; injectKey: string; wsUrl: string };
+} = {
+    beta: { dashboardBase: "https://beta.dashboard.enreach.network", injectKey: "EnreachExt_beta", wsUrl: "https://dev-ws.enreach.network" },
+    staging: { dashboardBase: "https://staging.dashboard.enreach.network", injectKey: "EnreachExt_staging", wsUrl: "https://staging-ws-1.enreach.network" },
+    prod: { dashboardBase: "https://dashboard.enreach.network", injectKey: "EnreachExt", wsUrl: "https://ws.enreach.network" },
+};
+export const ENVData = ENVDataMap[ENV];
 export const KEYS = {
     ACCESS_TOKEN: "accessToken",
     USER_INFO: "userInfo",
@@ -8,19 +17,13 @@ export const KEYS = {
     USER_LOGOUT: "userLogout",
     IP_FROM_WS: "ipFromWS",
     CONNECT_ERROR: "connectError",
-};
+} as const;
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];
+export type KEYSType = (typeof KEYS)[keyof typeof KEYS];
 
-export const CON = {
-    InjectKey: "__EnReachAI",
-    NameForContentScript: "EnReachAI_content_script",
-    NameForPopup: "EnReachAI_popup",
-};
-
-export const DashboardBase = "https://beta.dashboard.enreach.network";
-export const WSURL = "https://dev-ws.enreach.network";
-// export const WSURL = "wss://dev-ws.enreach.network";
+export const DashboardBase = ENVData.dashboardBase;
+export const WSURL = ENVData.wsUrl;
 export const HOME_BASE = "https://enreach.network";
 
 export const Matches: string[] = ["<all_urls>", "http://*.enreach.network/*"];

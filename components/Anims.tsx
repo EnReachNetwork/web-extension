@@ -1,3 +1,4 @@
+import path from "path";
 import { useState } from "react";
 import { useInterval } from "react-use";
 
@@ -48,8 +49,8 @@ import { useInterval } from "react-use";
 //         </svg>
 //     );
 // }
-const animColor = "#4281FF"
-export function ConnectingAnim(p: {className?: string}) {
+const animColor = "#4281FF";
+export function ConnectingAnim(p: { className?: string }) {
     const [num, setNum] = useState(1);
     useInterval(() => setNum((last) => (last >= 5 ? 1 : last + 1)), 400);
     return (
@@ -280,7 +281,7 @@ export function ConnectingAnim(p: {className?: string}) {
             <path d="M46.333 145.425V148.029L47.3443 158.361V155.755L46.333 145.425Z" fill="white" />
             <path
                 d="M61.3348 150.495L59.0185 149.192L64.7087 145.993L46.333 145.425L47.3443 155.755L53.0346 152.555L67.4732 160.673L73.4572 157.312L61.3348 150.495Z"
-                fill={num === 2 ? animColor: "#fff"}
+                fill={num === 2 ? animColor : "#fff"}
             />
             <path d="M47.3447 155.755V158.362L53.035 155.16V152.556L47.3447 155.755Z" fill="#3A3A3A" />
             <path d="M53.0342 152.556V155.16L67.4728 163.279V160.673L53.0342 152.556Z" fill="#3A3A3A" />
@@ -363,7 +364,10 @@ export function ConnectingAnim(p: {className?: string}) {
                 fill="#3A3A3A"
             />
             <path d="M168.078 153.441V155.928L153.081 164.363L150.868 163.116L168.078 153.441Z" fill="#3A3A3A" />
-            <path d="M168.078 153.441L150.868 163.116L156.064 166.04L139.284 166.56L140.209 157.124L145.404 160.046L162.617 150.37L168.078 153.441Z" fill={num === 1 ? animColor: "#fff"} />
+            <path
+                d="M168.078 153.441L150.868 163.116L156.064 166.04L139.284 166.56L140.209 157.124L145.404 160.046L162.617 150.37L168.078 153.441Z"
+                fill={num === 1 ? animColor : "#fff"}
+            />
             <path d="M156.064 166.168V168.527L139.284 169.047V166.559L156.064 166.04V166.168Z" fill="#3A3A3A" />
             <path
                 d="M139.284 166.959C139.172 166.959 139.063 166.914 138.986 166.834C138.907 166.751 138.866 166.637 138.877 166.522L139.801 157.086C139.815 156.951 139.897 156.831 140.023 156.77C140.146 156.708 140.296 156.711 140.416 156.778L145.407 159.585L162.414 150.024C162.54 149.952 162.699 149.952 162.825 150.024L168.286 153.094C168.411 153.166 168.491 153.297 168.491 153.441C168.491 153.584 168.411 153.715 168.286 153.787L151.692 163.116L156.272 165.694C156.431 165.784 156.51 165.963 156.464 166.136C156.42 166.309 156.261 166.432 156.078 166.437C156.075 166.44 139.287 166.959 139.284 166.959ZM140.556 157.782L139.735 166.147L154.612 165.686L150.661 163.462C150.535 163.39 150.455 163.26 150.455 163.116C150.455 162.972 150.535 162.842 150.661 162.77L167.255 153.441L162.614 150.831L145.607 160.391C145.481 160.463 145.322 160.463 145.197 160.391L140.556 157.782Z"
@@ -412,14 +416,14 @@ export function ConnectingAnim(p: {className?: string}) {
                 d="M142.176 70.6311C141.862 70.6311 141.607 70.3836 141.607 70.077V35.6125C141.607 35.3059 141.862 35.0583 142.176 35.0583C142.491 35.0583 142.745 35.3059 142.745 35.6125V70.077C142.745 70.3836 142.491 70.6311 142.176 70.6311Z"
                 fill="#3A3A3A"
             />
-            <path d="M69.8045 61.6792V77.0925L57.0547 84.7992C57.0547 76.2832 62.7584 65.939 69.8045 61.6792Z" fill={num > 2 ? animColor: "#fff"} />
+            <path d="M69.8045 61.6792V77.0925L57.0547 84.7992C57.0547 76.2832 62.7584 65.939 69.8045 61.6792Z" fill={num > 2 ? animColor : "#fff"} />
             <path
                 d="M69.8043 34.7124V50.1221C66.9647 51.84 64.2482 54.1281 61.746 56.8135C55.9158 63.0745 51.2629 71.5095 48.9962 79.9298C48.0227 83.5385 47.492 87.1472 47.492 90.5794L34.7422 98.286C34.7387 74.8754 50.4335 46.4178 69.8043 34.7124Z"
-                fill={num > 3 ? animColor: "#fff"}
+                fill={num > 3 ? animColor : "#fff"}
             />
             <path
                 d="M69.8046 7.74004V23.1497C66.8245 24.9485 63.9111 27.0674 61.0927 29.4475C43.458 44.3384 29.5308 69.5884 26.0306 93.021C25.4683 96.7622 25.1766 100.463 25.1766 104.064L12.4268 111.771C12.4268 73.4656 38.1127 26.8945 69.8046 7.74004Z"
-                fill={num > 4 ? animColor: "#fff"}
+                fill={num > 4 ? animColor : "#fff"}
             />
 
             <path
@@ -574,7 +578,7 @@ export function NetworkQulityAnim(p: { netQulityDeg?: string }) {
                 style={{
                     transition: "all ease 1s",
                     transformOrigin: "right center",
-                    visibility: !p.netQulityDeg || p.netQulityDeg === '-' ? "hidden" : "visible",
+                    visibility: !p.netQulityDeg || p.netQulityDeg === "-" ? "hidden" : "visible",
                     transform: `rotate(${p.netQulityDeg})`,
                 }}
                 width="66"
@@ -604,3 +608,38 @@ export function NetworkQulityAnim(p: { netQulityDeg?: string }) {
         </div>
     );
 }
+
+// function convertRange(value: number, old: [number, number], n: [number, number]) {
+//     const [min1, max1] = old;
+//     const [min2, max2] = n;
+//     // value - min1/ max1 - min1 = x - min2/ max2 - min2
+//     return ((value - min1) / (max1 - min1)) * (max2 - min2) + min2;
+// }
+// export function NetworkQulityAnim2(p: { netQulityDeg?: string }) {
+//     const R = 10;
+//     const path = `M${R} ${97 - R}A${96 - R} ${96 - R},0,0,1,${192 - R} ${97 - R}`;
+//     return (
+//         <div className="relative">
+//             <svg width="192" height="97" viewBox="0 0 192 97" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                 <path fill="none" stroke="red" strokeWidth={R * 2} d={path} strokeLinecap="round" strokeDasharray="300" strokeDashoffset={300} />
+//             </svg>
+//             <svg
+//                 className="absolute"
+//                 style={{
+//                     left: 0,
+//                     bottom: 0,
+//                     transition: "all ease 1s",
+//                     transformOrigin: "right center",
+//                     visibility: !p.netQulityDeg || p.netQulityDeg === "-" ? "hidden" : "visible",
+//                     transform: `rotate(${p.netQulityDeg})`,
+//                 }}
+//                 width="96"
+//                 viewBox={`0 0 96 ${R * 2}`}
+//                 fill="none"
+//                 xmlns="http://www.w3.org/2000/svg"
+//             >
+//                 <circle r={R} cx={R} cy={R} fill="green" />
+//             </svg>
+//         </div>
+//     );
+// }

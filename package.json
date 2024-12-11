@@ -6,7 +6,9 @@
     "author": "wxydev002@outlook.com",
     "scripts": {
         "dev": "plasmo dev",
-        "build": "plasmo build",
+        "build_beta": "plasmo build --tag beta",
+        "build_staging": "plasmo build --tag staging",
+        "build_prod": "plasmo build --tag prod",
         "package": "plasmo package"
     },
     "dependencies": {

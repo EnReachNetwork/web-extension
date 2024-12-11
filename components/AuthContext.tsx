@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import _ from "lodash";
 import React, { createContext, useContext } from "react";
 
 import { KEYS } from "~constants";
-import useLocalStorage from "~hooks/useLocalStorage";
 import Api, { configAuth } from "~libs/apis";
 import { genNodeId } from "~libs/genNodeId";
 import { clearForLogout, storage } from "~libs/mstorage";
 import { RES } from "~libs/type";
 import { User } from "~libs/user";
+import { useStoreItem } from "./Store";
 
 interface AuthContextProps {
     userInfo?: User;
@@ -28,8 +27,8 @@ interface AuthProviderProps {
 genNodeId()
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [accessToken, setAccessToken] = useLocalStorage<string>(KEYS.ACCESS_TOKEN, "");
-    const [userInfo, setUserInfo] = useLocalStorage<User>(KEYS.USER_INFO);
+    const [accessToken] = useStoreItem(KEYS.ACCESS_TOKEN)
+    const [userInfo, setUserInfo] = useStoreItem<User>(KEYS.USER_INFO);
     const logoutUser = async () => {
         storage.set(KEYS.USER_LOGOUT, true);
         clearForLogout()

@@ -8,22 +8,23 @@ import { RiDiscordLine, RiTwitterXLine } from "react-icons/ri";
 
 import { DashboardBase, HOME_BASE, KEYS, levels, StatusConnect } from "~constants";
 import { useCopy } from "~hooks/useCopy";
-import useLocalStorage from "~hooks/useLocalStorage";
 import Api from "~libs/apis";
 import { goToFollowX, goToJoinDiscord } from "~libs/handlers";
 import { imgLogo } from "~libs/imgs";
 import { IPData, NodeID, RES } from "~libs/type";
+import { User } from "~libs/user";
 import { cn } from "~libs/utils";
 
 import { ConnectingAnim, NetworkQulityAnim } from "./Anims";
 import { useAuthContext } from "./AuthContext";
 import { GoToDashboard } from "./Buttom";
 import { fmtBerry, fmtBoost, fmtNetqulityDeg } from "./fmtData";
+import { useStoreItem } from "./Store";
 import { Berry, Exp, Rocket } from "./svgs/icons";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
-    const [connectError] = useLocalStorage(KEYS.CONNECT_ERROR);
-    // const [connectError] = useLocalStorage(KEYS.CONNECT_ERROR,'err');
+    const [connectError] = useStoreItem(KEYS.CONNECT_ERROR);
+    // const [connectError] = useStoreItem(KEYS.CONNECT_ERROR,'err');
     return (
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
@@ -47,7 +48,7 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
 }
 
 function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
-    const { userInfo, logoutUser, isFetchingUserInfo } = useAuthContext();
+    const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
     const copy = useCopy();
     const exp = userInfo?.stat?.exp || 0;
     const endLevel = levels.find((l) => l.exp > exp) || levels[levels.length - 1];
@@ -57,15 +58,19 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
         setProcess(Math.floor((exp * 100) / endLevel.exp));
     }, [exp]);
     // const currentProcess = ;
-    const [nodeID] = useLocalStorage<NodeID>(KEYS.NODE_ID);
-    const [ipFromWS] = useLocalStorage<string>(KEYS.IP_FROM_WS);
+    const [nodeID] = useStoreItem<NodeID>(KEYS.NODE_ID);
+    const [ipFromWS] = useStoreItem<string>(KEYS.IP_FROM_WS);
     const { data: netQuality, isFetching: isFetchingNetQuality } = useQuery({
+        initialData: "-",
         queryKey: ["NetworkQuality", nodeID, ipFromWS],
         enabled: Boolean(nodeID) && Boolean(ipFromWS),
         refetchInterval: 1000 * 60 * 2,
         retry: true,
+        
         retryDelay: 5000,
         refetchIntervalInBackground: true,
+        refetchOnMount: true,
+        structuralSharing: false,
         queryFn: async () => {
             const res = await Api.get<RES<{ lastReward: string }>>(`/api/node/${nodeID}/${encodeURIComponent(ipFromWS)}/reward`);
             return fmtNetqulityDeg(res.data.data.lastReward);
@@ -132,8 +137,8 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
 
 function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const ac = useAuthContext();
-    const [ip] = useLocalStorage<IPData>(KEYS.IP_DATA);
-    const [ipFromWs] = useLocalStorage<string>(KEYS.IP_FROM_WS);
+    const [ip] = useStoreItem<IPData>(KEYS.IP_DATA);
+    const [ipFromWs] = useStoreItem<string>(KEYS.IP_FROM_WS);
     const nodeIP = ipFromWs || ip?.ipString || "-";
     return (
         <div className="flex flex-col items-center w-full h-full gap-[10px]">
@@ -173,7 +178,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
 }
 export const Home: React.FC = () => {
     const [showUser, setShowUser] = useState(false);
-    const [status] = useLocalStorage<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
+    const [status] = useStoreItem<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
     // const isConnected = false;
     const isConnected = status === "connected";
     const onClickUser = () => setShowUser(true);
