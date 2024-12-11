@@ -2,7 +2,7 @@ export const ENV: "beta" | "staging" | "prod" = process.env.PLASMO_TAG === "dev"
 export const ENVDataMap: {
     [k in typeof ENV]: { dashboardBase: string; injectKey: string; wsUrl: string };
 } = {
-    beta: { dashboardBase: "https://beta.dashboard.enreach.network", injectKey: "EnreachExt_beta", wsUrl: "https://dev-ws.enreach.network" },
+    beta: { dashboardBase: "https://beta.dashboard.enreach.network", injectKey: "EnreachExt_beta", wsUrl: "wss://dev-ws.enreach.network" },
     staging: { dashboardBase: "https://staging.dashboard.enreach.network", injectKey: "EnreachExt_staging", wsUrl: "https://staging-ws-1.enreach.network" },
     prod: { dashboardBase: "https://dashboard.enreach.network", injectKey: "EnreachExt", wsUrl: "https://ws.enreach.network" },
 };

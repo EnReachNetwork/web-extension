@@ -34,3 +34,6 @@ dist/
 
 # typescript
 .tsbuildinfo
+
+# React Component Preview
+previewConfig.json

@@ -2,14 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import Avatar from "boring-avatars";
 import _ from "lodash";
 import React, { MouseEventHandler, useEffect, useState } from "react";
-import { FiAlertCircle, FiChevronLeft, FiLogOut } from "react-icons/fi";
+import { FiAlertCircle, FiChevronLeft } from "react-icons/fi";
 import { PiCopySimple } from "react-icons/pi";
-import { RiDiscordLine, RiTwitterXLine } from "react-icons/ri";
+import { RiDiscordFill, RiTelegram2Fill, RiTwitterXFill } from "react-icons/ri";
+import { TbLogout } from "react-icons/tb";
 
 import { DashboardBase, HOME_BASE, KEYS, levels, StatusConnect } from "~constants";
 import { useCopy } from "~hooks/useCopy";
 import Api from "~libs/apis";
-import { goToFollowX, goToJoinDiscord } from "~libs/handlers";
+import { goToFollowX, goToJoinDiscord, goToTelegram } from "~libs/handlers";
 import { imgLogo } from "~libs/imgs";
 import { IPData, NodeID, RES } from "~libs/type";
 import { User } from "~libs/user";
@@ -23,12 +24,16 @@ import { useStoreItem } from "./Store";
 import { Berry, Exp, Rocket } from "./svgs/icons";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
+    const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
     const [connectError] = useStoreItem(KEYS.CONNECT_ERROR);
     // const [connectError] = useStoreItem(KEYS.CONNECT_ERROR,'err');
     return (
         <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
+            <div className="w-full flex items-start justify-between">
+                <img src={imgLogo} className="h-[60px] -ml-[30px] mt-1 translate-x-4 -translate-y-5" alt={"logo"} />
+                <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
+            </div>
             <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
-                <img src={imgLogo} className="h-[60px] translate-x-4 -translate-y-5" alt={"logo"} />
                 <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3" />
                 {/* <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" /> */}
             </div>
@@ -66,7 +71,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
         enabled: Boolean(nodeID) && Boolean(ipFromWS),
         refetchInterval: 1000 * 60 * 2,
         retry: true,
-        
+
         retryDelay: 5000,
         refetchIntervalInBackground: true,
         refetchOnMount: true,
@@ -76,10 +81,13 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
             return fmtNetqulityDeg(res.data.data.lastReward);
         },
     });
+    const netQualityDeg = _.toNumber(netQuality.replace("-", "").replace("deg", ""));
+    const netQualityName = netQuality === "-" ? "-" : netQualityDeg < 60 ? "Poor" : netQualityDeg < 120 ? "Good" : "Superb";
     const total = _.toNumber(userInfo?.point.total || 0);
     const boost = fmtBoost(userInfo?.stat.extraBoost);
     const mTotal = fmtBerry(total * boost);
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
+
     return (
         <div className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
             {/* <div className="self-end border border-[#595959] w-[44px] h-[44px] rounded-full">
@@ -89,7 +97,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
             <Avatar name={userInfo?.email} size={40} className="cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
             <div className="flex flex-col gap-2 w-full items-center mt-[30px]">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
-                <span className="font-semibold text-sm text-center">Network Quality</span>
+                <span className="font-semibold text-sm text-center">Network Quality: {netQualityName}</span>
                 <div className="flex items-center gap-[6px]">
                     <div className="bg-green-500/90 rounded-full w-2 h-2" />
                     <div className="bg-[#3A3A3A] rounded-full px-2 py-[2px] text-xs font-medium">Connected</div>
@@ -126,7 +134,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
             </div>
             <div className="flex items-center justify-center gap-1">
                 <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
-                <div className="w-[41px] h-[41px] rounded-full bg-primary flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
+                <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
                     <PiCopySimple className="rotate-90 text-base" />
                 </div>
             </div>
@@ -140,39 +148,52 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const [ip] = useStoreItem<IPData>(KEYS.IP_DATA);
     const [ipFromWs] = useStoreItem<string>(KEYS.IP_FROM_WS);
     const nodeIP = ipFromWs || ip?.ipString || "-";
+    const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
+    const copy = useCopy();
+    const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
+    const socialClassName = "flex justify-center items-center w-8 h-8 border border-white rounded-full cursor-pointer text-xl hover:text-primary hover:border-primary";
     return (
-        <div className="flex flex-col items-center w-full h-full gap-[10px]">
+        <div className="flex flex-col items-center w-full h-full gap-4">
             <div className="flex items-center justify-between w-full p-4">
                 <div className="flex items-center justify-center cursor-pointer h-11 w-11" onClick={p.onBack}>
                     <FiChevronLeft className="text-2xl" />
                 </div>
-            </div>
-            <Avatar name={ac.userInfo?.email} size={66} className="mt-9" variant="marble" />
-            <span>{ac.userInfo?.email || ""}</span>
-            <div className="flex flex-col gap-[10px] w-full px-[25px] mt-2.5">
-                <div className="bg-[#595959] w-full flex px-5 py-3 rounded-lg justify-between flex-wrap">
-                    <span className="whitespace-nowrap">Node IP: </span>
-                    <span className="text-sm text-white/80">{nodeIP}</span>
-                </div>
-                <button className="text-base font-medium btn" onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
-                    About EnReach
-                </button>
-                <div className="px-6 flex items-center justify-between text-base">
-                    <div className="flex items-center gap-[15px] text-xl">
-                        <RiTwitterXLine className="cursor-pointer hover:text-primary" onClick={goToFollowX} />
-                        <RiDiscordLine className="text-2xl cursor-pointer hover:text-primary" onClick={goToJoinDiscord} />
-                    </div>
-                    <span
-                        className="cursor-pointer hover:text-primary"
-                        onClick={() => {
-                            ac.logoutUser();
-                        }}
-                    >
-                        <FiLogOut />
-                    </span>
+                <div className="flex items-center justify-center cursor-pointer h-11 w-11" onClick={ac.logoutUser}>
+                    <TbLogout className="text-xl text-[#C64C4C]" />
                 </div>
             </div>
-            <GoToDashboard className="mt-auto mb-[29px]" />
+            <Avatar name={ac.userInfo?.email} size={50} className="mt-7" variant="marble" />
+            <div className="items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
+                <div className="">{ac.userInfo?.email || ""}</div>
+                <div className="font-bold mt-2.5">Node IP</div>
+                <div className="">{nodeIP}</div>
+            </div>
+            <div className="flex items-center justify-center gap-1 mt-6">
+                <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
+                <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
+                    <PiCopySimple className="rotate-90 text-base" />
+                </div>
+            </div>
+            <div className="flex justify-center items-center gap-5 text-white mt-6">
+                <div className={socialClassName} onClick={goToFollowX}>
+                    <RiTwitterXFill />
+                </div>
+                <div className={socialClassName} onClick={goToJoinDiscord}>
+                    <RiDiscordFill />
+                </div>
+                <div className={socialClassName} onClick={goToTelegram}>
+                    <RiTelegram2Fill />
+                </div>
+            </div>
+            <div className="flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
+                <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={() => chrome.tabs.create({ url: HOME_BASE })}>
+                    Website
+                </div>
+                <div className="inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]" onClick={() => chrome.tabs.create({ url: "" })}>
+                    Guide
+                </div>
+            </div>
+            <GoToDashboard className=" mb-[29px]" />
         </div>
     );
 }

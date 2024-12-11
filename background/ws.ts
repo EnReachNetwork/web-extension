@@ -82,13 +82,14 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
         // will auto connect
         console.error("socket:", e.message);
         // set connect
-        setConnectStatus("connecting");
-        setConnectError(e.message);
-        if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
-        lastSocket.pingTask = null;
         const msg = e.message;
         if ((typeof msg === "string" && msg.startsWith("invalid ip address:")) || ["invalid userId", "server err", "invalid auth token"].includes(msg)) {
             closeLast(socket);
+        } else {
+            setConnectStatus("connecting");
+            setConnectError(e.message);
+            if (lastSocket.pingTask) clearInterval(lastSocket.pingTask);
+            lastSocket.pingTask = null;
         }
     });
     socket.on("disconnect", (reason) => {

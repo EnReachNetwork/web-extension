@@ -6,3 +6,6 @@ export const goToJoinDiscord = () =>
     chrome.tabs.create({
         url: encodeURI("https://discord.com/invite/XbWKu397"),
     });
+export const goToTelegram = () => chrome.tabs.create({
+    url: encodeURI("https://t.me/EnReachNetwork")
+})
