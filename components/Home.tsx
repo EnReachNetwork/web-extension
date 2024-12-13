@@ -10,7 +10,7 @@ import { TbLogout } from "react-icons/tb";
 import { DashboardBase, HOME_BASE, KEYS, levels, StatusConnect } from "~constants";
 import { useCopy } from "~hooks/useCopy";
 import Api from "~libs/apis";
-import { goToFollowX, goToJoinDiscord, goToTelegram, goToGuide, goToWebsite } from "~libs/handlers";
+import { goToFollowX, goToGuide, goToJoinDiscord, goToTelegram, goToWebsite } from "~libs/handlers";
 import { imgLogo } from "~libs/imgs";
 import { IPData, NodeID, RES } from "~libs/type";
 import { User } from "~libs/user";
@@ -18,11 +18,11 @@ import { cn } from "~libs/utils";
 
 import { ConnectingAnim, NetworkQulityAnim } from "./Anims";
 import { useAuthContext } from "./AuthContext";
+import { AutoFlip } from "./auto-flip";
 import { GoToDashboard } from "./Buttom";
 import { fmtBerry, fmtBoost, fmtNetqulityDeg } from "./fmtData";
 import { useStoreItem } from "./Store";
 import { Berry, Exp, Rocket } from "./svgs/icons";
-import { AutoFlip } from "./auto-flip";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
     const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
@@ -91,7 +91,10 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
 
     return (
         <AutoFlip className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
-            <Avatar name={userInfo?.email} size={40} className="flip_item cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
+           <div className="flip_item w-full flex items-start justify-between mb-6">
+                <img src={imgLogo} className="h-[29px]" alt={"logo"} />
+                <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
+            </div>
             <div className="flip_item flex flex-col gap-2 w-full items-center mt-[30px]">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
                 <span className="font-semibold text-sm text-center">Network Quality: {netQualityName}</span>
@@ -135,7 +138,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                     <PiCopySimple className="rotate-90 text-base" />
                 </div>
             </div>
-            <GoToDashboard className="flip_item mb-[18px] mt-auto"/>
+            <GoToDashboard className="flip_item mb-[18px] mt-auto" />
         </AutoFlip>
     );
 }
@@ -160,7 +163,9 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                     <TbLogout className="text-xl text-[#C64C4C]" />
                 </div>
             </div>
-            <Avatar name={ac.userInfo?.email} size={50} className="flip_item mt-7" variant="marble" />
+            <div className="flip_item mt-7">
+                <Avatar name={ac.userInfo?.email} size={50} variant="marble" />
+            </div>
             <div className="flip_item items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
                 <div className="">{ac.userInfo?.email || ""}</div>
                 <div className="font-bold mt-7">Node IP</div>

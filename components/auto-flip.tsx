@@ -1,6 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { PropsWithChildren, useRef } from "react";
+import { cn } from "~libs/utils";
 
 gsap.registerPlugin(useGSAP);
 
@@ -15,7 +16,7 @@ export function AutoFlip(p: PropsWithChildren & { className?: string }) {
     { scope: container }
   );
   return (
-    <div className={p.className} ref={container}>
+    <div className={cn("overflow-hidden",p.className)} ref={container}>
       {p.children}
     </div>
   );
