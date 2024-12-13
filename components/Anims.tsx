@@ -550,24 +550,10 @@ export function NetworkQulityAnim(p: { netQulityDeg?: string }) {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <g filter="url(#filter0_d_3513_2786)">
-                    <path
-                        d="M13.3152 22.2997L162.541 33.9886C167.725 34.3938 172.869 33.0689 176.238 30.4517L182.052 25.9259C186.908 22.1475 186.94 16.6064 182.124 12.7846L176.358 8.20175C173.018 5.55078 167.898 4.17263 162.706 4.51924L13.362 14.6461C6.40107 15.1019 6.36558 21.7532 13.3152 22.2997Z"
-                        fill="#E7E6ED"
-                    />
-                </g>
-                <defs>
-                    <filter id="filter0_d_3513_2786" x="0.12207" y="0.466553" width="193.593" height="45.5939" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                        <feOffset dy="4" />
-                        <feGaussianBlur stdDeviation="4" />
-                        <feComposite in2="hardAlpha" operator="out" />
-                        <feColorMatrix type="matrix" values="0 0 0 0 0.542497 0 0 0 0 0.542497 0 0 0 0 0.542497 0 0 0 1 0" />
-                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3513_2786" />
-                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3513_2786" result="shape" />
-                    </filter>
-                </defs>
+                <path
+                    d="M13.3152 22.2997L162.541 33.9886C167.725 34.3938 172.869 33.0689 176.238 30.4517L182.052 25.9259C186.908 22.1475 186.94 16.6064 182.124 12.7846L176.358 8.20175C173.018 5.55078 167.898 4.17263 162.706 4.51924L13.362 14.6461C6.40107 15.1019 6.36558 21.7532 13.3152 22.2997Z"
+                    fill="#E7E6ED"
+                />
             </svg>
         </div>
     );

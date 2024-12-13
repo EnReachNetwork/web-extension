@@ -22,33 +22,34 @@ import { GoToDashboard } from "./Buttom";
 import { fmtBerry, fmtBoost, fmtNetqulityDeg } from "./fmtData";
 import { useStoreItem } from "./Store";
 import { Berry, Exp, Rocket } from "./svgs/icons";
+import { AutoFlip } from "./auto-flip";
 
 function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
     const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
     const [connectError] = useStoreItem(KEYS.CONNECT_ERROR);
     // const [connectError] = useStoreItem(KEYS.CONNECT_ERROR,'err');
     return (
-        <div className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
-            <div className="w-full flex items-start justify-between mb-6">
+        <AutoFlip className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
+            <div className="flip_item w-full flex items-start justify-between mb-6">
                 <img src={imgLogo} className="h-[29px]" alt={"logo"} />
                 <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
             </div>
-            <div className="flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
+            <div className="flip_item flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
                 <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3" />
                 {/* <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" /> */}
             </div>
             {/* <div className="font-medium text-white text-center text-[15px] my-auto ">Connecting...</div> */}
-            <div className="font-medium text-white text-center text-[15px my-auto flex items-end gap-2">
+            <div className="flip_item font-medium text-white text-center text-[15px my-auto flex items-end gap-2">
                 Connecting<div className="loading -translate-y-1"></div>
             </div>
-            <GoToDashboard className="mb-[11px]" />
+            <GoToDashboard className="flip_item mb-[18px] mt-auto" />
             {Boolean(connectError) && (
                 <p className="text-left flex items-start gap-1 p-3 text-xs bg-primary absolute left-0 bottom-0 rounded-t-[30px] w-full">
                     <FiAlertCircle className="text-base " />
                     There seems to be a network issue, please check your internet connectivity.
                 </p>
             )}
-        </div>
+        </AutoFlip>
     );
 }
 
@@ -89,9 +90,9 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
 
     return (
-        <div className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
-            <Avatar name={userInfo?.email} size={40} className="cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
-            <div className="flex flex-col gap-2 w-full items-center mt-[30px]">
+        <AutoFlip className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
+            <Avatar name={userInfo?.email} size={40} className="flip_item cursor-pointer self-end" variant="marble" onClick={p.onClickUser} />
+            <div className="flip_item flex flex-col gap-2 w-full items-center mt-[30px]">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
                 <span className="font-semibold text-sm text-center">Network Quality: {netQualityName}</span>
                 <div className="flex items-center gap-[6px]">
@@ -100,7 +101,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 </div>
             </div>
 
-            <div className={cn("bg-[#595959] w-full p-4 rounded-[25px]")}>
+            <div className={cn("flip_item bg-[#595959] w-full p-4 rounded-[25px]")}>
                 <div className="flex justify-between  leading-3 ">
                     <div>
                         <span className="font-semibold text-[10px] text-[#999999]">Total Rewards</span>
@@ -128,14 +129,14 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                     <Exp />
                 </div>
             </div>
-            <div className="flex items-center justify-center gap-1">
-                <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
+            <div className="flip_item flex items-center justify-center gap-1">
+                <button className="text-sm font-medium btn2 w-[129px] !cursor-default">Referral Link</button>
                 <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
                     <PiCopySimple className="rotate-90 text-base" />
                 </div>
             </div>
-            <GoToDashboard />
-        </div>
+            <GoToDashboard className="flip_item mb-[18px] mt-auto"/>
+        </AutoFlip>
     );
 }
 
@@ -150,28 +151,28 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
     const socialClassName = "flex justify-center items-center w-8 h-8 border border-white rounded-full cursor-pointer text-xl hover:text-primary hover:border-primary";
     const linkClassName = "inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]";
     return (
-        <div className="flex flex-col items-center w-full h-full gap-4">
-            <div className="flex items-center justify-between w-full p-4">
-                <div className="flex items-center justify-center cursor-pointer h-11 w-11" onClick={p.onBack}>
+        <AutoFlip className="flex flex-col items-center w-full h-full gap-4">
+            <div className="flip_item flex items-center justify-between w-full p-4">
+                <div className="flex items-center justify-center cursor-pointer h-11 w-11 hover:text-primary" onClick={p.onBack}>
                     <FiChevronLeft className="text-2xl" />
                 </div>
                 <div className="flex items-center justify-center cursor-pointer h-11 w-11" onClick={ac.logoutUser}>
                     <TbLogout className="text-xl text-[#C64C4C]" />
                 </div>
             </div>
-            <Avatar name={ac.userInfo?.email} size={50} className="mt-7" variant="marble" />
-            <div className="items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
+            <Avatar name={ac.userInfo?.email} size={50} className="flip_item mt-7" variant="marble" />
+            <div className="flip_item items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
                 <div className="">{ac.userInfo?.email || ""}</div>
                 <div className="font-bold mt-7">Node IP</div>
                 <div className="mt-2">{nodeIP}</div>
             </div>
-            <div className="flex items-center justify-center gap-1 mt-6">
-                <button className="text-sm font-medium btn2 w-[129px]">Referral Link</button>
+            <div className="flip_item flex items-center justify-center gap-1 mt-6">
+                <button className="text-sm font-medium btn2 w-[129px] !cursor-default">Referral Link</button>
                 <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
                     <PiCopySimple className="rotate-90 text-base" />
                 </div>
             </div>
-            <div className="flex justify-center items-center gap-5 text-white mt-6">
+            <div className="flip_item flex justify-center items-center gap-5 text-white mt-6">
                 <div className={socialClassName} onClick={goToFollowX}>
                     <RiTwitterXFill />
                 </div>
@@ -182,7 +183,7 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                     <RiTelegram2Fill />
                 </div>
             </div>
-            <div className="flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
+            <div className="flip_item flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
                 <div className={linkClassName} onClick={goToWebsite}>
                     Website
                 </div>
@@ -190,8 +191,8 @@ function UserUI(p: { onBack: MouseEventHandler<any> }) {
                     Guide
                 </div>
             </div>
-            <GoToDashboard className=" mb-[29px]" />
-        </div>
+            <GoToDashboard className="flip_item mb-[36px]" />
+        </AutoFlip>
     );
 }
 export const Home: React.FC = () => {
