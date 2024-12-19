@@ -6,7 +6,7 @@ export const ENVDataMap: {
     staging: {
         dashboardBase: "https://staging.dashboard.enreach.network",
         injectKey: "EnreachExt_staging",
-        wsUrl: "wss://staging-ws-1.enreach.network",
+        wsUrl: "https://staging-ws-1.enreach.network",
         api: "https://staging-api-1.enreach.network",
     },
     prod: { dashboardBase: "https://dashboard.enreach.network", injectKey: "EnreachExt", wsUrl: "https://ws.enreach.network", api: "https://api.enreach.network" },

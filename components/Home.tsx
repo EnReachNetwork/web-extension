@@ -95,7 +95,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 <img src={imgLogo} className="h-[29px]" alt={"logo"} />
                 <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
             </div>
-            <div className="flip_item flex flex-col gap-2 w-full items-center mt-[30px]">
+            <div className="flip_item flex flex-col gap-2 w-full items-center">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
                 <span className="font-semibold text-sm text-center">Network Quality: {netQualityName}</span>
                 <div className="flex items-center gap-[6px]">
@@ -132,7 +132,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                     <Exp />
                 </div>
             </div>
-            <div className="flip_item flex items-center justify-center gap-1">
+            <div className="flip_item flex items-center justify-center gap-1 ">
                 <button className="text-sm font-medium btn2 w-[129px] !cursor-default">Referral Link</button>
                 <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
                     <PiCopySimple className="rotate-90 text-base" />
