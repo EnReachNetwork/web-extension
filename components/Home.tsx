@@ -86,7 +86,7 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
     const netQualityName = netQuality === "-" ? "-" : netQualityDeg < 60 ? "Poor" : netQualityDeg < 120 ? "Good" : "Superb";
     const total = _.toNumber(userInfo?.point.total || 0);
     const boost = fmtBoost(userInfo?.stat.extraBoost);
-    const mTotal = fmtBerry(total * boost);
+    const mTotal = fmtBerry(total * _.toNumber(boost));
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
 
     return (

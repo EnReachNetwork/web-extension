@@ -1,7 +1,8 @@
 import axios from "axios";
+import { ENVData } from "~constants";
 
 const Api = axios.create({
-    baseURL: "https://dev-api.enreach.network",
+    baseURL: ENVData.api,
     headers: {
         "Content-Type": "application/json",
     },

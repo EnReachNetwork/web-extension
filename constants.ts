@@ -1,10 +1,15 @@
 export const ENV: "beta" | "staging" | "prod" = process.env.PLASMO_TAG === "dev" ? "beta" : (process.env.PLASMO_TAG as any) || "beta";
 export const ENVDataMap: {
-    [k in typeof ENV]: { dashboardBase: string; injectKey: string; wsUrl: string };
+    [k in typeof ENV]: { dashboardBase: string; injectKey: string; wsUrl: string; api: string };
 } = {
-    beta: { dashboardBase: "https://beta.dashboard.enreach.network", injectKey: "EnreachExt_beta", wsUrl: "wss://dev-ws.enreach.network" },
-    staging: { dashboardBase: "https://staging.dashboard.enreach.network", injectKey: "EnreachExt_staging", wsUrl: "https://staging-ws-1.enreach.network" },
-    prod: { dashboardBase: "https://dashboard.enreach.network", injectKey: "EnreachExt", wsUrl: "https://ws.enreach.network" },
+    beta: { dashboardBase: "https://beta.dashboard.enreach.network", injectKey: "EnreachExt_beta", wsUrl: "wss://dev-ws.enreach.network", api: "https://dev-api.enreach.network" },
+    staging: {
+        dashboardBase: "https://staging.dashboard.enreach.network",
+        injectKey: "EnreachExt_staging",
+        wsUrl: "wss://staging-ws-1.enreach.network",
+        api: "https://staging-api-1.enreach.network",
+    },
+    prod: { dashboardBase: "https://dashboard.enreach.network", injectKey: "EnreachExt", wsUrl: "https://ws.enreach.network", api: "https://api.enreach.network" },
 };
 export const ENVData = ENVDataMap[ENV];
 export const KEYS = {

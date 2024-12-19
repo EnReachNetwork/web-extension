@@ -2,14 +2,16 @@ import _ from "lodash";
 import numbro from "numbro";
 
 export function fmtBerry(berry?: string | number | null, def: "-" | number = 0) {
-  const total = _.toNumber(berry);
-  return total
-    ? numbro(total).format({
-        mantissa: 2,
-        trimMantissa: true,
-        average: total >= 1000,
-      }).toUpperCase()
-    : def;
+    const total = _.toNumber(berry);
+    return total
+        ? numbro(total)
+              .format({
+                  mantissa: 2,
+                  trimMantissa: true,
+                  average: total >= 1000,
+              })
+              .toUpperCase()
+        : def;
 }
 
 export function fmtNetqulity(last?: string | number | number, def: "-" | `${number}%` = "-") {
@@ -22,5 +24,5 @@ export function fmtNetqulityDeg(last?: string | number | number, def: "-" | `${n
 }
 
 export function fmtBoost(boost?: string | number | number) {
-    return Math.max(_.round(_.toNumber(boost), 1), 1);
+    return numbro(Math.max(_.toNumber(boost || "1"), 1)).format({ mantissa: 1, trimMantissa: false });
 }
