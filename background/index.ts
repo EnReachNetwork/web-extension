@@ -6,7 +6,7 @@ import { storage } from "~libs/mstorage";
 import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 import { runLoop } from "~libs/utils";
-
+import { Peer } from "peerjs"
 import { closeLast, connect } from "./ws";
 
 const connectByAuthUser = async () => {

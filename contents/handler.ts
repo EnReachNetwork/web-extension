@@ -1,7 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo";
 
-import { sendToBackground } from "@plasmohq/messaging";
-import { relay } from "@plasmohq/messaging/relay";
+import { relayMessage } from "@plasmohq/messaging";
 
 export const config: PlasmoCSConfig = {
     matches: ["<all_urls>"],
@@ -9,5 +8,6 @@ export const config: PlasmoCSConfig = {
 
 const relayNames = ["ping", "getStat", "setAccessToken", "clearAccessToken", "clearLogout"];
 for (const name of relayNames) {
-    relay({ name }, sendToBackground);
+    // @ts-ignore
+    relayMessage({ name });
 }

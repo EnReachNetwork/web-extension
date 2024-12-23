@@ -25,5 +25,5 @@ if (window.__EnReachExt) {
 }
 window[ENVData.injectKey] = {
     name: "ContentInjected",
-    request: sendToBackgroundViaRelay,
+    request:(req) =>  sendToBackgroundViaRelay(req),
 };

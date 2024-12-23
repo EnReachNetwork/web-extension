@@ -14,7 +14,12 @@ function AppImpl() {
 export const App: React.FC = () => {
     return (
         <Providers>
-            <Toaster position="top-center" offset={50} theme="light" />
+            <Toaster position="top-center" offset={60} theme="light" style={
+                // @ts-ignore
+                { '--width': '180px', '--mobile-offset': '50px' }
+            } toastOptions={{
+                classNames: { 'toast': "rounded-xl bg-[#585858] border border-solid border-white/10 text-white/60 text-xs px-4 py-2" }
+            }} />
             <AppImpl />
         </Providers>
     );
