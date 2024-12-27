@@ -28,6 +28,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-icons": "^5.4.0",
+        "react-router": "v6.x",
         "react-use": "^17.5.1",
         "socket.io-client": "^4.8.1",
         "sonner": "^1.7.0",
@@ -52,7 +53,18 @@
             "<all_urls>"
         ],
         "permissions": [
-            "scripting"
+            "scripting",
+            "offscreen"
+        ],
+        "web_accessible_resources": [
+            {
+                "matches": [
+                    "<all_urls>"
+                ],
+                "resources": [
+                    "tabs/offscreen.html"
+                ]
+            }
         ]
     }
 }

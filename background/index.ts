@@ -6,7 +6,7 @@ import { storage } from "~libs/mstorage";
 import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 import { runLoop } from "~libs/utils";
-import { Peer } from "peerjs"
+
 import { closeLast, connect } from "./ws";
 
 const connectByAuthUser = async () => {
@@ -17,6 +17,46 @@ const connectByAuthUser = async () => {
     console.info("connectIf", Boolean(auth), Boolean(user), Boolean(nodeId), Boolean(ipData));
     auth && user && nodeId && ipData && connect(auth, user, nodeId, ipData);
 };
+
+async function hasOffscreenDocument(url: string): Promise<boolean> {
+    if ("getContexts" in chrome.runtime) {
+        const contexts = await chrome.runtime.getContexts({
+            contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT],
+            documentUrls: [url],
+        });
+        return Boolean(contexts.length);
+    } else {
+        // @ts-ignore
+        const matchedClients = await clients.matchAll();
+        return await matchedClients.some((client) => {
+            client.url.includes(chrome.runtime.id);
+        });
+    }
+}
+let creating; // A global promise to avoid concurrency issues
+async function setupOffscreenDocument() {
+    // Check all windows controlled by the service worker to see if one
+    // of them is the offscreen document with the given path
+    const path = "/tabs/offscreen.html";
+    const offscreenUrl = chrome.runtime.getURL(path);
+    const hasOffscreen = await hasOffscreenDocument(offscreenUrl);
+    if (hasOffscreen) {
+        return;
+    }
+
+    // create offscreen document
+    if (creating) {
+        await creating;
+    } else {
+        creating = chrome.offscreen.createDocument({
+            url: path,
+            reasons: [chrome.offscreen.Reason.WEB_RTC],
+            justification: "reason for needing the WebRTC",
+        });
+        await creating;
+        creating = null;
+    }
+}
 
 async function main() {
     connectByAuthUser();
@@ -44,8 +84,10 @@ async function main() {
         },
         10000,
     );
-    
+
     chrome.action.openPopup();
+    //
+    setupOffscreenDocument();
 }
 
 main().catch(console.error);

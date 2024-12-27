@@ -1,39 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
-import Avatar from "boring-avatars";
 import _ from "lodash";
-import React, { MouseEventHandler, useEffect, useState } from "react";
-import { FiAlertCircle, FiChevronLeft } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
+import { FiAlertCircle } from "react-icons/fi";
 import { PiCopySimple } from "react-icons/pi";
-import { RiDiscordFill, RiTelegram2Fill, RiTwitterXFill } from "react-icons/ri";
-import { TbLogout } from "react-icons/tb";
 
-import { DashboardBase, HOME_BASE, KEYS, levels, StatusConnect } from "~constants";
+import { DashboardBase, KEYS, levels, StatusConnect } from "~constants";
 import { useCopy } from "~hooks/useCopy";
 import Api from "~libs/apis";
-import { goToFollowX, goToGuide, goToJoinDiscord, goToTelegram, goToWebsite } from "~libs/handlers";
-import { imgLogo } from "~libs/imgs";
-import { IPData, NodeID, RES } from "~libs/type";
+import { NodeID, RES } from "~libs/type";
 import { User } from "~libs/user";
 import { cn } from "~libs/utils";
 
 import { ConnectingAnim, NetworkQulityAnim } from "./Anims";
-import { useAuthContext } from "./AuthContext";
 import { AutoFlip } from "./auto-flip";
-import { GoToDashboard } from "./Buttom";
 import { fmtBerry, fmtBoost, fmtNetqulityDeg } from "./fmtData";
+import { GoToDashboard } from "./Footers";
+import { HeaderLogo } from "./Headers";
 import { useStoreItem } from "./Store";
 import { Berry, Exp, Rocket } from "./svgs/icons";
+import { TapSprite } from "./RouterTap";
 
-function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
-    const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
+function ConnectingUI() {
     const [connectError] = useStoreItem(KEYS.CONNECT_ERROR);
     // const [connectError] = useStoreItem(KEYS.CONNECT_ERROR,'err');
     return (
         <AutoFlip className="flex flex-col flex-1 w-full h-full p-[18px] items-center justify-between relative">
-            <div className="flip_item w-full flex items-start justify-between mb-6">
-                <img src={imgLogo} className="h-[29px]" alt={"logo"} />
-                <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
-            </div>
+            <HeaderLogo />
             <div className="flip_item flex w-full rounded-[34px] bg-[#595959] p-6 flex-col items-center">
                 <ConnectingAnim className="mt-8 mb-12 h-[195px] translate-x-3" />
                 {/* <img src={connectingGif} className="mt-8 mb-12 h-[195px] translate-x-3" alt="login" /> */}
@@ -53,7 +45,7 @@ function ConnectingUI(p: { onClickUser: MouseEventHandler<any> }) {
     );
 }
 
-function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
+function ConnectedUI() {
     const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
     const copy = useCopy();
     const exp = userInfo?.stat?.exp || 0;
@@ -88,13 +80,10 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
     const boost = fmtBoost(userInfo?.stat.extraBoost);
     const mTotal = fmtBerry(total * _.toNumber(boost));
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
-
+   
     return (
-        <AutoFlip className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7">
-           <div className="flip_item w-full flex items-start justify-between mb-6">
-                <img src={imgLogo} className="h-[29px]" alt={"logo"} />
-                <Avatar name={userInfo?.email} size={40} className="cursor-pointer" variant="marble" onClick={p.onClickUser} />
-            </div>
+        <AutoFlip className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7 relative">
+            <HeaderLogo />
             <div className="flip_item flex flex-col gap-2 w-full items-center">
                 <NetworkQulityAnim netQulityDeg={netQuality} />
                 <span className="font-semibold text-sm text-center">Network Quality: {netQualityName}</span>
@@ -139,72 +128,14 @@ function ConnectedUI(p: { onClickUser: MouseEventHandler<any> }) {
                 </div>
             </div>
             <GoToDashboard className="flip_item mb-[18px] mt-auto" />
+            {/* <TapSprite/> */}
         </AutoFlip>
     );
 }
 
-function UserUI(p: { onBack: MouseEventHandler<any> }) {
-    const ac = useAuthContext();
-    const [ip] = useStoreItem<IPData>(KEYS.IP_DATA);
-    const [ipFromWs] = useStoreItem<string>(KEYS.IP_FROM_WS);
-    const nodeIP = ipFromWs || ip?.ipString || "-";
-    const [userInfo] = useStoreItem<User | undefined>(KEYS.USER_INFO);
-    const copy = useCopy();
-    const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
-    const socialClassName = "flex justify-center items-center w-8 h-8 border border-white rounded-full cursor-pointer text-xl hover:text-primary hover:border-primary";
-    const linkClassName = "inline-block mx-1 underline underline-offset-4 cursor-pointer hover:text-[#4281FF]";
-    return (
-        <AutoFlip className="flex flex-col items-center w-full h-full gap-4">
-            <div className="flip_item flex items-center justify-between w-full p-4">
-                <div className="flex items-center justify-center cursor-pointer h-11 w-11 hover:text-primary" onClick={p.onBack}>
-                    <FiChevronLeft className="text-2xl" />
-                </div>
-                <div className="flex items-center justify-center cursor-pointer h-11 w-11" onClick={ac.logoutUser}>
-                    <TbLogout className="text-xl text-[#C64C4C]" />
-                </div>
-            </div>
-            <div className="flip_item mt-7">
-                <Avatar name={ac.userInfo?.email} size={50} variant="marble" />
-            </div>
-            <div className="flip_item items-center text-[#8A8A8A] text-sm text-center whitespace-nowrap">
-                <div className="">{ac.userInfo?.email || ""}</div>
-                <div className="font-bold mt-7">Node IP</div>
-                <div className="mt-2">{nodeIP}</div>
-            </div>
-            <div className="flip_item flex items-center justify-center gap-1 mt-6">
-                <button className="text-sm font-medium btn2 w-[129px] !cursor-default">Referral Link</button>
-                <div className="w-[41px] h-[41px] rounded-full bg-primary hover:bg-white/15 flex justify-center items-center cursor-pointer" onClick={onCopyReferral}>
-                    <PiCopySimple className="rotate-90 text-base" />
-                </div>
-            </div>
-            <div className="flip_item flex justify-center items-center gap-5 text-white mt-6">
-                <div className={socialClassName} onClick={goToFollowX}>
-                    <RiTwitterXFill />
-                </div>
-                <div className={socialClassName} onClick={goToJoinDiscord}>
-                    <RiDiscordFill />
-                </div>
-                <div className={socialClassName} onClick={goToTelegram}>
-                    <RiTelegram2Fill />
-                </div>
-            </div>
-            <div className="flip_item flex items-center mt-auto text-[#8A8A8A] gap-9 text-xs">
-                <div className={linkClassName} onClick={goToWebsite}>
-                    Website
-                </div>
-                <div className={linkClassName} onClick={goToGuide}>
-                    Guide
-                </div>
-            </div>
-            <GoToDashboard className="flip_item mb-[36px]" />
-        </AutoFlip>
-    );
-}
 export const Home: React.FC = () => {
-    const [showUser, setShowUser] = useState(false);
     const [status] = useStoreItem<StatusConnect>(KEYS.STATUS_CONNECT, "connecting");
     // const isConnected = false;
     const isConnected = status === "connected";
-    const onClickUser = () => setShowUser(true);
-    return showUser ? <UserUI onBack={() => setShowUser(false)} /> : isConnected ? <ConnectedUI onClickUser={onClickUser} /> : <ConnectingUI onClickUser={onClickUser} />;
+    return isConnected ? <ConnectedUI /> : <ConnectingUI />;
 };

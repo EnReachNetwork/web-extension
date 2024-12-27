@@ -31,7 +31,8 @@
     font-display: swap;
     src: url("url:~assets/fonts/AlbertSans-Bold.ttf") format("woff2");
 }
-html,body {
+html,
+body {
     font-size: 16px;
     font-family:
         Albert Sans,
@@ -51,6 +52,16 @@ html,body {
 
 .logo_bg {
     background: url("url:~assets/bg.svg") no-repeat;
+}
+
+.tap-sprite1 {
+    background: url("url:~assets/tap-sprite1.svg") no-repeat;
+}
+.tap-sprite2 {
+    background: url("url:~assets/tap-sprite2.svg") no-repeat;
+}
+.tap-sprite3 {
+    background: url("url:~assets/tap-sprite3.svg") no-repeat;
 }
 
 /* HTML: <div class="loader"></div> */

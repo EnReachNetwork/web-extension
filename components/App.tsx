@@ -1,15 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "sonner";
 
 import { useAuthContext } from "./AuthContext";
-import { Home } from "./Home";
-import { Login } from "./Login";
+import { Home } from "./RouterHome";
+import { Login } from "./RouterLogin";
 import { Providers } from "./Providers";
+import { MemoryRouter, Routes, Route, useNavigate, useResolvedPath, useLocation, } from "react-router";
+import { User } from "./RouterUser";
+import { Tap } from "./RouterTap";
 
-function AppImpl() {
+
+function AutoNavForUser() {
+    const nav = useNavigate()
     const { userInfo } = useAuthContext();
-    // return <Login/>
-    return userInfo ? <Home /> : <Login />;
+    const { pathname } = useLocation()
+    useEffect(() => {
+        console.info('hhh:', pathname, !!userInfo)
+        if (userInfo && ['/', '/login'].includes(pathname)) {
+            nav("/home")
+        } else if (!userInfo && pathname !== '/login') {
+            nav("/login")
+        }
+    }, [pathname, userInfo])
+    return null
+}
+function AppImpl() {
+    return <MemoryRouter>
+        <AutoNavForUser />
+        <Routes>
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/user" element={<User />} />
+            <Route path="/tap" element={<Tap />} />
+        </Routes>
+    </MemoryRouter>
 }
 export const App: React.FC = () => {
     return (
