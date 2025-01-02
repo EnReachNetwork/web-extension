@@ -2,6 +2,7 @@ import axios from "axios";
 import { shuffle } from "lodash";
 
 import { IPData } from "./type";
+import { sleep } from "./utils";
 
 async function getIP_0(): Promise<IPData> {
     const data = await axios.get<IPData>("https://api.bigdatacloud.net/data/client-ip");
@@ -33,7 +34,7 @@ export async function getIP() {
         }
         i++;
         if (i >= funcs.length) {
-            await new Promise((reslove) => setTimeout(reslove, 5000));
+            await sleep(5000);
             i = 0;
         }
     }

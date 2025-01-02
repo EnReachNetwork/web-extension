@@ -22,7 +22,8 @@ export const KEYS = {
     USER_LOGOUT: "userLogout",
     IP_FROM_WS: "ipFromWS",
     CONNECT_ERROR: "connectError",
-    IS_TAPING: 'isTaping',
+    ON_TAP: "onTap",
+    TAP_STAT: "TapStat",
 } as const;
 export const StatusConnectList = ["idle", "connecting", "connected"] as const;
 export type StatusConnect = (typeof StatusConnectList)[number];

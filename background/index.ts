@@ -1,12 +1,15 @@
 import "@plasmohq/messaging/background";
 
 import { KEYS } from "~constants";
+import { configAuth } from "~libs/apis";
 import { getIP } from "~libs/getIp";
 import { storage } from "~libs/mstorage";
 import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 import { runLoop } from "~libs/utils";
 
+import apiRequest from "./messages/apiRequest";
+import reqStorage from "./messages/reqStorage";
 import { closeLast, connect } from "./ws";
 
 const connectByAuthUser = async () => {
@@ -14,6 +17,7 @@ const connectByAuthUser = async () => {
     const user = await storage.get<User>(KEYS.USER_INFO);
     const nodeId = await storage.get<NodeID>(KEYS.NODE_ID);
     const ipData = await storage.get<IPData>(KEYS.IP_DATA);
+    configAuth(auth);
     console.info("connectIf", Boolean(auth), Boolean(user), Boolean(nodeId), Boolean(ipData));
     auth && user && nodeId && ipData && connect(auth, user, nodeId, ipData);
 };
@@ -59,6 +63,7 @@ async function setupOffscreenDocument() {
 }
 
 async function main() {
+    storage.remove(KEYS.TAP_STAT)
     connectByAuthUser();
     storage.watch({
         [KEYS.USER_INFO]: connectByAuthUser,
@@ -67,6 +72,7 @@ async function main() {
         [KEYS.ACCESS_TOKEN]: (e) => {
             console.info("do close last connect", !Boolean(e.newValue));
             !Boolean(e.newValue) && closeLast();
+            configAuth(e.newValue);
         },
     });
     let lastIpData: IPData = null;
@@ -88,6 +94,20 @@ async function main() {
     chrome.action.openPopup();
     //
     setupOffscreenDocument();
+
+    // for offscreen
+    const offscreenHandler = {
+        reqStorage,
+        apiRequest,
+    };
+    chrome.runtime.onMessage.addListener((msg, sender, relay) => {
+        console.info("onMsg:", msg, sender);
+        const { type, target, data } = msg;
+        if (target !== "sw") return;
+        if (type in offscreenHandler) {
+            offscreenHandler[type]({ body: data, sender }, { send: relay });
+        }
+    });
 }
 
 main().catch(console.error);

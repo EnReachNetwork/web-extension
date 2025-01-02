@@ -1,16 +1,15 @@
-import { startPeerJs, startTap } from "~/libs/tap"
+import { startPeerJs, startTap } from "~tabs/tap"
 
 chrome.runtime.onMessage.addListener((msg, sender, sendRes) => {
     console.info('onMsg', msg, sender)
     const { type, data, target } = msg
     if (!target || target !== 'offscreen') return;
     if (type == "onTap") {
-        const { userId, peerServer } = data
-        startPeerJs(userId, peerServer);
+        const { userId, uuid } = data
+        startPeerJs(userId, uuid);
     } else if (type == 'doTap') {
-        const { userId, peerServer } = data
-        startPeerJs(userId, peerServer)
-        startTap([])
+        const { userId } = data
+        startTap(userId)
     }
 })
 

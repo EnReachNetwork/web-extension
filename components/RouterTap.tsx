@@ -1,46 +1,49 @@
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { KEYS } from "~constants";
-import { useCopy } from "~hooks/useCopy";
+import { OnTap, TapStat } from "~libs/type";
+import { User } from "~libs/user";
 import { cn } from "~libs/utils";
+import { AnimOnTap, AnimTaping, AnimTapSleep } from "./Anims";
 import { useAuthContext } from "./AuthContext";
 import { AutoFlip } from "./auto-flip";
 import { HeaderBack } from "./Headers";
 import { useStoreItem } from "./Store";
-import { AnimOnTap, AnimTaping, AnimTapSleep } from "./Anims";
+import { useInterval } from "react-use";
+import { useState } from "react";
 
 function useTapStat() {
     const ac = useAuthContext();
-    const [ipFromWs] = useStoreItem<string>(KEYS.IP_FROM_WS);
-    return useQuery<{ hasOnTap: boolean, canTap: boolean, showType: 'tap' | 'ontap' | 'sleep' }>({
-        queryKey: ['QueryTapStat', ac.userInfo.id, ipFromWs],
-        initialData: { hasOnTap: false, canTap: false, showType: 'sleep' },
-        queryFn: async () => {
-            const hasOnTap = false
-            const canTap = true;
-            return { hasOnTap, canTap, showType: hasOnTap ? 'ontap' : canTap ? 'tap' : 'sleep' }
-        }
-    })
+    const [tapStat, setTapStat] = useStoreItem<TapStat>(KEYS.TAP_STAT, null)
+    const [taps, setTaps] = useStoreItem<OnTap>(KEYS.ON_TAP, [])
+    const [ctime, setCTime] = useState(new Date().getTime())
+    useInterval(() => {
+        setCTime(new Date().getTime())
+    }, 1000)
+    const isSleep = Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000)
+    return {
+        showType: taps.length ? 'ontap' : isSleep ? 'sleep' : 'tap',
+        isTaping: Boolean(tapStat) && tapStat.stat === 'taping',
+        taps,
+        setTapStat,
+        setTaps
+    }
 }
 
 export function Tap() {
     const ts = useTapStat()
-    const [isTaping, setIsTaping] = useStoreItem<boolean>(KEYS.IS_TAPING)
-    const copy = useCopy();
+
     const onClickCheck = () => {
 
     }
+    const [user] = useStoreItem<User>(KEYS.USER_INFO)
+    const isTaping = ts.isTaping;
     const onClickStart = () => {
-        setIsTaping(true)
-        setTimeout(() => {
-            setIsTaping(false)
-        }, 5000);
+        if (ts.showType === "taping" || !user) return;
         chrome.runtime.sendMessage({
             target: 'offscreen',
             type: 'doTap',
             data: {
-                userId: '1234',
-                peerServer: 'localhost:4004'
+                userId: user.id,
             }
         })
     }
@@ -49,17 +52,17 @@ export function Tap() {
             <HeaderBack type="user" />
             <div className="flip_item relative flex justify-center items-center w-[289px] h-[289px] mx-auto">
                 <div className="absolute top-0 left-0 z-0 w-full h-full  rounded-full bg-[#434343]" />
-                {ts.data.showType === 'tap' && <AnimTaping taping={isTaping} />}
-                {ts.data.showType === 'sleep' && <AnimTapSleep />}
-                {ts.data.showType === 'ontap' && <AnimOnTap />}
+                {ts.showType === 'tap' && <AnimTaping taping={isTaping} />}
+                {ts.showType === 'sleep' && <AnimTapSleep />}
+                {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
             <div className="flip_item text-[15px] font-medium mx-4">
-                {ts.data.showType === 'tap' && (isTaping ? 'Waiting...' : 'Go find your berry friend.')}
-                {ts.data.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
-                {ts.data.showType === 'ontap' && 'Your berry found a new friend!'}
+                {ts.showType === 'tap' && (isTaping ? 'Waiting...' : 'Go find your berry friend.')}
+                {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
+                {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
-            {ts.data.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
-            {ts.data.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickCheck}>Check it out</button>}
+            {ts.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
+            {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickCheck}>Check it out</button>}
         </AutoFlip>
     );
 }
@@ -69,8 +72,8 @@ export function TapSprite() {
     const nav = useNavigate()
     const ts = useTapStat()
     return <div className={cn("flip_item absolute left-5 top-16 cursor-pointer h-11 bg-contain", {
-        "w-10 tap-sprite1": ts.data.showType === 'tap',
-        "w-11 tap-sprite2": ts.data.showType === 'sleep',
-        "w-[49px] tap-sprite3": ts.data.showType === 'ontap',
+        "w-10 tap-sprite1": ts.showType === 'tap',
+        "w-11 tap-sprite2": ts.showType === 'sleep',
+        "w-[49px] tap-sprite3": ts.showType === 'ontap',
     })} onClick={() => nav('/tap')} />
 }

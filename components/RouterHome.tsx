@@ -128,7 +128,7 @@ function ConnectedUI() {
                 </div>
             </div>
             <GoToDashboard className="flip_item mb-[18px] mt-auto" />
-            {/* <TapSprite/> */}
+            <TapSprite/>
         </AutoFlip>
     );
 }

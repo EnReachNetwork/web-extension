@@ -1,9 +1,7 @@
-import _ from "lodash";
 import { io, Socket } from "socket.io-client";
 
 import { WSURL } from "~constants";
 import { setConnectError, setConnectStatus, setIpFromWS } from "~libs/mstorage";
-import { startPeerJs } from "~libs/tap";
 import { IPData, NodeID } from "~libs/type";
 import { User } from "~libs/user";
 
@@ -59,9 +57,8 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
         console.info("onPong:");
     });
     // for Tap
-    socket.on("onTap", (data) => {
-        const { userId, peerServer } = data;
-        chrome.runtime.sendMessage({ type: "onTap", target: "offscreen", data: data });
+    socket.on("tap", (uuid) => {
+        chrome.runtime.sendMessage({ type: "onTap", target: "offscreen", data: { peerServer: "beta-peers.enreach.network", userId: user.id, uuid } });
     });
     // auth success
     socket.on("auth", (data) => {

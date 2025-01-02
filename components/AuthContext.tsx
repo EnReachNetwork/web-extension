@@ -8,7 +8,6 @@ import { clearForLogout, storage } from "~libs/mstorage";
 import { RES } from "~libs/type";
 import { User } from "~libs/user";
 import { useStoreItem } from "./Store";
-import { useNavigate } from "react-router"
 interface AuthContextProps {
     userInfo?: User;
     logoutUser: () => Promise<void>;

@@ -6,6 +6,7 @@ import Api, { configAuth } from "~libs/apis";
 import { storage } from "~libs/mstorage";
 import { RES } from "~libs/type";
 import { User } from "~libs/user";
+import { sleep } from "~libs/utils";
 
 async function updateUserInfo() {
     while (true) {
@@ -15,7 +16,7 @@ async function updateUserInfo() {
             return true;
         } catch (error) {
             console.error("updateUserInfo:", error);
-            await new Promise((reslove) => setTimeout(reslove, 4000));
+            await sleep(4000)
         }
     }
 }
