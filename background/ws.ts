@@ -58,6 +58,7 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     });
     // for Tap
     socket.on("tap", (uuid) => {
+        console.info("onTap:", uuid);
         chrome.runtime.sendMessage({ type: "onTap", target: "offscreen", data: { peerServer: "beta-peers.enreach.network", userId: user.id, uuid } });
     });
     // auth success
@@ -108,5 +109,5 @@ export function connect(token: string, user: User, nodeId: NodeID, ipData: IPDat
     });
     try {
         (global as any).getEnreachState = () => ({ active: socket.active, id: socket.id });
-    } catch (error) {}
+    } catch (error) { }
 }

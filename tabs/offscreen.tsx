@@ -1,14 +1,17 @@
-import { startPeerJs, startTap } from "~tabs/tap"
+import { connectionPeerJsServer, startTap } from "~tabs/tap"
 
 chrome.runtime.onMessage.addListener((msg, sender, sendRes) => {
-    console.info('onMsg', msg, sender)
+    // console.info('onMsg', msg, sender)
     const { type, data, target } = msg
     if (!target || target !== 'offscreen') return;
     if (type == "onTap") {
+        // 其他用户开始tap, 如果没有连接到peerjs, 则连接
         const { userId, uuid } = data
-        startPeerJs(userId, uuid);
+        console.log(`onTap: userId=${userId}, uuid=${uuid}`)
+        connectionPeerJsServer(userId, uuid);
     } else if (type == 'doTap') {
         const { userId } = data
+        console.log(`doTap: userId=${userId}`)
         startTap(userId)
     }
 })

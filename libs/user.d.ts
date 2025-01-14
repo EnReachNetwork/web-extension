@@ -15,6 +15,10 @@ export interface User {
    */
   email: string;
   /**
+   * 用户私钥
+   */
+  privateKey: string;
+  /**
    * 用户id
    */
   id: string;

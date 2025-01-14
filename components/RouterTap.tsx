@@ -31,9 +31,9 @@ function useTapStat() {
 
 export function Tap() {
     const ts = useTapStat()
-
     const onClickCheck = () => {
-
+        // TODO: 跳转到Dashboard-Album页面
+        console.log(`Go to album`)
     }
     const [user] = useStoreItem<User>(KEYS.USER_INFO)
     const isTaping = ts.isTaping;
