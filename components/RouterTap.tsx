@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { KEYS } from "~constants";
-import { OnTap, TapStat } from "~libs/type";
+import { NodeID, OnTap, RES, TapStat } from "~libs/type";
 import { User } from "~libs/user";
 import { cn } from "~libs/utils";
 import { AnimOnTap, AnimTaping, AnimTapSleep } from "./Anims";
@@ -10,20 +10,35 @@ import { HeaderBack } from "./Headers";
 import { useStoreItem } from "./Store";
 import { useInterval } from "react-use";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Api from "~libs/apis";
+import { goToAlbum } from "~libs/handlers";
 
 function useTapStat() {
     const ac = useAuthContext();
     const [tapStat, setTapStat] = useStoreItem<TapStat>(KEYS.TAP_STAT, null)
     const [taps, setTaps] = useStoreItem<OnTap>(KEYS.ON_TAP, [])
     const [ctime, setCTime] = useState(new Date().getTime())
+    const { data: tapRemain } = useQuery({
+        enabled: Boolean(ac.userInfo),
+        queryKey: ['querytapRemin', ac.userInfo?.id],
+        initialData: { hasUnRead: false, remain: 0, success: 0 },
+        queryFn: async () => {
+            const tapRemain = await Api.get<RES<{ success: number, remain: number }>>(`/api/extension/tap/remain`).then(item => item.data.data)
+            const unReadTap = await Api.get<RES<{ hasUnRead: boolean }>>(`/api/extension/tap/unread`).then(item => item.data.data)
+            return { ...tapRemain, ...unReadTap }
+        }
+    })
     useInterval(() => {
         setCTime(new Date().getTime())
     }, 1000)
-    const isSleep = Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000)
+
+    const isSleep = tapRemain.remain == 0 || (Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000))
     return {
-        showType: taps.length ? 'ontap' : isSleep ? 'sleep' : 'tap',
+        showType: !Boolean(tapRemain) ? '' : taps.length || tapRemain.hasUnRead ? 'ontap' : isSleep ? 'sleep' : 'tap',
         isTaping: Boolean(tapStat) && tapStat.stat === 'taping',
         taps,
+        msg: tapStat.msg,
         setTapStat,
         setTaps
     }
@@ -31,10 +46,6 @@ function useTapStat() {
 
 export function Tap() {
     const ts = useTapStat()
-    const onClickCheck = () => {
-        // TODO: 跳转到Dashboard-Album页面
-        console.log(`Go to album`)
-    }
     const [user] = useStoreItem<User>(KEYS.USER_INFO)
     const isTaping = ts.isTaping;
     const onClickStart = () => {
@@ -57,12 +68,12 @@ export function Tap() {
                 {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
             <div className="flip_item text-[15px] font-medium mx-4">
-                {ts.showType === 'tap' && (isTaping ? 'Waiting...' : 'Go find your berry friend.')}
+                {ts.showType === 'tap' && (isTaping ? ts.msg ?? 'Waiting...' : 'Go find your berry friend.')}
                 {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
             {ts.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
-            {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickCheck}>Check it out</button>}
+            {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={goToAlbum}>Check it out</button>}
         </AutoFlip>
     );
 }
@@ -71,9 +82,9 @@ export function Tap() {
 export function TapSprite() {
     const nav = useNavigate()
     const ts = useTapStat()
-    return <div className={cn("flip_item absolute left-5 top-16 cursor-pointer h-11 bg-contain", {
+    return <div className={cn("flip_item absolute left-5 top-16 cursor-pointer h-11 bg-contain bg-transparent", {
         "w-10 tap-sprite1": ts.showType === 'tap',
         "w-11 tap-sprite2": ts.showType === 'sleep',
         "w-[49px] tap-sprite3": ts.showType === 'ontap',
-    })} onClick={() => nav('/tap')} />
+    })} onClick={() => Boolean(ts.showType) && nav('/tap')} />
 }

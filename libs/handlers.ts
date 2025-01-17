@@ -1,4 +1,4 @@
-import { HOME_BASE } from "~constants";
+import { DashboardBase, HOME_BASE } from "~constants";
 
 export const goToFollowX = () =>
     chrome.tabs.create({
@@ -16,3 +16,5 @@ export const goToTelegram = () =>
 export const goToGuide = () => chrome.tabs.create({ url: "https://docs.enreach.network/user-guide" });
 
 export const goToWebsite = () => chrome.tabs.create({ url: HOME_BASE });
+
+export const goToAlbum = () => chrome.tabs.create({ url: `${DashboardBase}/?tab=album` });

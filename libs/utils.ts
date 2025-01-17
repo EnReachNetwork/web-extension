@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import _ from "lodash";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -23,4 +24,17 @@ export async function runLoop(name: string, fn: () => Promise<any> | any, interv
     }
 }
 
-
+export async function retry<T>(fn: () => Promise<T> | T, { interval = 1000, count = Infinity }: { interval?: number; count?: number } = {}) {
+    while (true) {
+        try {
+            return await fn();
+        } catch (error) {
+            console.error("retry", count, error);
+            if (count <= 1) {
+                throw error;
+            }
+        }
+        count--;
+        await sleep(interval);
+    }
+}

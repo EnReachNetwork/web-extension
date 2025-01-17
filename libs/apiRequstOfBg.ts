@@ -1,5 +1,5 @@
 
-import { AxiosRequestConfig } from "~node_modules/axios";
+import { AxiosRequestConfig } from "axios";
 
 export async function requsetOfBg<T>(req: AxiosRequestConfig & { path: `/${string}` }) {
     const data =  await chrome.runtime.sendMessage<any,{ success: T } | { error: any }>({ type: 'apiRequest', target: 'sw', data: req})

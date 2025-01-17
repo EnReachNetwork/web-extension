@@ -13,5 +13,6 @@ export type OnTap = {
 
 export type TapStat = {
     stat: "taping" | "success";
+    msg: string;
     lastSuccessTime: number;
 };

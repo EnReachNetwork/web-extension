@@ -2,7 +2,7 @@ import type { MessageName, PlasmoMessaging } from "@plasmohq/messaging";
 
 import Api from "~libs/apis";
 import { RES } from "~libs/type";
-import { AxiosRequestConfig } from "~node_modules/axios";
+import { AxiosRequestConfig } from "axios";
 
 
 async function handler<T>(req: PlasmoMessaging.Request<MessageName, AxiosRequestConfig & { path: `/${string}` }>, res: PlasmoMessaging.Response<{ success: T } | { error: any }>) {
