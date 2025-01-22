@@ -26,3 +26,7 @@ export function fmtNetqulityDeg(last?: string | number | number, def: "-" | `${n
 export function fmtBoost(boost?: string | number | number) {
     return numbro(Math.max(_.toNumber(boost || "1"), 1)).format({ mantissa: 1, trimMantissa: false });
 }
+
+export function fmtSpeed(speed: number) {
+    return numbro(speed).format({ average: true, mantissa: 2, trimMantissa: true }).toUpperCase();
+}

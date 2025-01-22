@@ -1,6 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useInterval } from "react-use";
 import { KEYS } from "~constants";
-import { NodeID, OnTap, RES, TapStat } from "~libs/type";
+import Api from "~libs/apis";
+import { goToAlbum } from "~libs/handlers";
+import { OnTap, RES, TapStat } from "~libs/type";
 import { User } from "~libs/user";
 import { cn } from "~libs/utils";
 import { AnimOnTap, AnimTaping, AnimTapSleep } from "./Anims";
@@ -8,11 +13,6 @@ import { useAuthContext } from "./AuthContext";
 import { AutoFlip } from "./auto-flip";
 import { HeaderBack } from "./Headers";
 import { useStoreItem } from "./Store";
-import { useInterval } from "react-use";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import Api from "~libs/apis";
-import { goToAlbum } from "~libs/handlers";
 
 function useTapStat() {
     const ac = useAuthContext();
@@ -21,7 +21,7 @@ function useTapStat() {
     const [ctime, setCTime] = useState(new Date().getTime())
     const { data: tapRemain } = useQuery({
         enabled: Boolean(ac.userInfo),
-        queryKey: ['querytapRemin', ac.userInfo?.id],
+        queryKey: ['querytapRemin', ac.userInfo?.id, tapStat?.stat],
         initialData: { hasUnRead: false, remain: 0, success: 0 },
         queryFn: async () => {
             const tapRemain = await Api.get<RES<{ success: number, remain: number }>>(`/api/extension/tap/remain`).then(item => item.data.data)
@@ -33,12 +33,12 @@ function useTapStat() {
         setCTime(new Date().getTime())
     }, 1000)
 
-    const isSleep = tapRemain.remain == 0 || (Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000))
+    const isSleep = tapRemain?.remain == 0 || (Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000))
     return {
         showType: !Boolean(tapRemain) ? '' : taps.length || tapRemain.hasUnRead ? 'ontap' : isSleep ? 'sleep' : 'tap',
         isTaping: Boolean(tapStat) && tapStat.stat === 'taping',
         taps,
-        msg: tapStat.msg,
+        msg: tapStat?.msg,
         setTapStat,
         setTaps
     }
@@ -68,7 +68,7 @@ export function Tap() {
                 {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
             <div className="flip_item text-[15px] font-medium mx-4">
-                {ts.showType === 'tap' && (isTaping ? ts.msg ?? 'Waiting...' : 'Go find your berry friend.')}
+                {ts.showType === 'tap' && (isTaping ? ts.msg || 'Waiting...' : 'Go find your berry friend.')}
                 {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
