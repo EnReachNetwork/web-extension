@@ -40,8 +40,8 @@ export function useStoreItem<T = string>(key: KEYSType, def?: T) {
     const store = useContext(StoreCtx);
     const setItem = useCallback(
         (data: T) => {
-            store.setStore({ [key]: data });
             storage.set(key, data);
+            store.setStore({ [key]: data });
         },
         [store.setStore],
     );

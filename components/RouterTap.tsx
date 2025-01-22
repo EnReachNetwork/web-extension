@@ -73,7 +73,10 @@ export function Tap() {
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
             {ts.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
-            {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={goToAlbum}>Check it out</button>}
+            {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={() => {
+                goToAlbum()
+                setTimeout(() => ts.setTaps([]))
+            }}>Check it out</button>}
         </AutoFlip>
     );
 }
