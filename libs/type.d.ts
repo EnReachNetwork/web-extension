@@ -12,7 +12,7 @@ export type OnTap = {
 }[];
 
 export type TapStat = {
-    stat: "taping" | "success";
+    stat?: "taping" | "success" | null;
     msg: string;
     lastSuccessTime: number;
 };

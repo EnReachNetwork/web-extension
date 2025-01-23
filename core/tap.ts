@@ -273,9 +273,9 @@ async function doTap(userId: string) {
         }
     } catch (e) {
         closePeer();
-        await updateTapStat({ msg: "Connection failed. You can try another time or check your network connectivity." });
-        await sleep(3000);
-        await updateTapStat({ stat: null, lastSuccessTime: 0, msg: e.message ?? "Network error" });
+        // await updateTapStat({ msg: "Connection failed. You can try another time or check your network connectivity." });
+        // await sleep(3000);
+        await updateTapStat({ stat: null, lastSuccessTime: 0, msg: "Oops! Peer connection failed. Check your network connection and try again." });
     }
 }
 

@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useInterval } from "react-use";
 import { KEYS } from "~constants";
 import Api from "~libs/apis";
 import { goToAlbum } from "~libs/handlers";
@@ -18,7 +17,6 @@ function useTapStat() {
     const ac = useAuthContext();
     const [tapStat, setTapStat] = useStoreItem<TapStat>(KEYS.TAP_STAT, null)
     const [taps, setTaps] = useStoreItem<OnTap>(KEYS.ON_TAP, [])
-    const [ctime, setCTime] = useState(new Date().getTime())
     const { data: tapRemain, refetch } = useQuery({
         enabled: Boolean(ac.userInfo),
         queryKey: ['querytapRemin', ac.userInfo?.id],
@@ -32,19 +30,17 @@ function useTapStat() {
     useEffect(() => {
         refetch()
     }, [tapStat?.stat])
-    
-    useInterval(() => {
-        setCTime(new Date().getTime())
-    }, 1000)
-
-    const isSleep = tapRemain?.remain == 0 || (Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000))
+    const tapSuccess = Boolean(tapStat) && tapStat.stat === 'success'
+    const isTaping = Boolean(tapStat) && tapStat.stat === 'taping'
+    const isOnTap = taps.length || tapRemain?.hasUnRead
 
     return {
-        showType: !Boolean(tapRemain) ? '' : taps.length || tapRemain.hasUnRead ? 'ontap' : isSleep ? 'sleep' : 'tap',
-        isTaping: Boolean(tapStat) && tapStat.stat === 'taping',
+        showType: !Boolean(tapRemain) ? '' : isTaping ? 'taping' : (tapSuccess || isOnTap) ? 'ontap' : tapRemain?.remain == 0 ? 'sleep' : 'tap',
+        isOnTap,
+        isTaping,
         taps,
         msg: tapStat?.msg,
-        setTapStat,
+        setTapStat: (ts: Partial<TapStat>) => setTapStat({ ...(tapStat || { stat: null, msg: '', lastSuccessTime: 0 }), ...ts }),
         setTaps
     }
 }
@@ -52,7 +48,6 @@ function useTapStat() {
 export function Tap() {
     const ts = useTapStat()
     const [user] = useStoreItem<User>(KEYS.USER_INFO)
-    const isTaping = ts.isTaping;
     const onClickStart = () => {
         if (ts.showType === "taping" || !user) return;
         chrome.runtime.sendMessage({
@@ -68,17 +63,20 @@ export function Tap() {
             <HeaderBack type="user" />
             <div className="flip_item relative flex justify-center items-center w-[289px] h-[289px] mx-auto">
                 <div className="absolute top-0 left-0 z-0 w-full h-full  rounded-full bg-[#434343]" />
-                {ts.showType === 'tap' && <AnimTaping taping={isTaping} />}
+                {ts.showType === 'tap' && <AnimTaping />}
+                {ts.showType === 'taping' && <AnimTaping taping />}
                 {ts.showType === 'sleep' && <AnimTapSleep />}
                 {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
             <div className="flip_item text-[15px] font-medium mx-4 text-center whitespace-pre-wrap mt-4">
-                {ts.showType === 'tap' && (isTaping ? ts.msg || 'Waiting...' : 'Go find your Buddy！！')}
+                {ts.showType === 'tap' && (ts.msg || 'Go find your Buddy！！')}
+                {ts.showType === 'taping' && (ts.msg || 'Waiting...')}
                 {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
-            {ts.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
+            {ts.showType === 'tap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
             {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={() => {
+                ts.setTapStat({ stat: null })
                 ts.setTaps([])
                 goToAlbum()
             }}>Check it out</button>}
@@ -91,7 +89,7 @@ export function TapSprite() {
     const nav = useNavigate()
     const ts = useTapStat()
     return <div className={cn("flip_item absolute left-5 top-16 cursor-pointer h-11 bg-contain bg-transparent", {
-        "w-10 tap-sprite1": ts.showType === 'tap',
+        "w-10 tap-sprite1": ts.showType === 'tap' || ts.showType == 'taping',
         "w-11 tap-sprite2": ts.showType === 'sleep',
         "w-[49px] tap-sprite3": ts.showType === 'ontap',
     })} onClick={() => Boolean(ts.showType) && nav('/tap')} />
