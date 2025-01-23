@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useInterval } from "react-use";
 import { KEYS } from "~constants";
@@ -19,16 +19,20 @@ function useTapStat() {
     const [tapStat, setTapStat] = useStoreItem<TapStat>(KEYS.TAP_STAT, null)
     const [taps, setTaps] = useStoreItem<OnTap>(KEYS.ON_TAP, [])
     const [ctime, setCTime] = useState(new Date().getTime())
-    const { data: tapRemain } = useQuery({
+    const { data: tapRemain, refetch } = useQuery({
         enabled: Boolean(ac.userInfo),
-        queryKey: ['querytapRemin', ac.userInfo?.id, tapStat?.stat],
-        initialData: undefined,
+        queryKey: ['querytapRemin', ac.userInfo?.id],
+        structuralSharing: true,
         queryFn: async () => {
             const tapRemain = await Api.get<RES<{ success: number, remain: number }>>(`/api/extension/tap/remain`).then(item => item.data.data)
             const unReadTap = await Api.get<RES<{ hasUnRead: boolean }>>(`/api/extension/tap/unread`).then(item => item.data.data)
             return { ...tapRemain, ...unReadTap }
         }
     })
+    useEffect(() => {
+        refetch()
+    }, [tapStat?.stat])
+    
     useInterval(() => {
         setCTime(new Date().getTime())
     }, 1000)
