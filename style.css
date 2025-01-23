@@ -46,7 +46,7 @@ body {
     }
 
     .btn2 {
-        @apply rounded-full bg-primary text-center flex justify-center items-center text-white h-[41px] w-full;
+        @apply rounded-full bg-primary text-center flex justify-center items-center text-white h-[41px] w-full hover:bg-white/15;
     }
 }
 

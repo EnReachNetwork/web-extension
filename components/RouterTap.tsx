@@ -22,7 +22,7 @@ function useTapStat() {
     const { data: tapRemain } = useQuery({
         enabled: Boolean(ac.userInfo),
         queryKey: ['querytapRemin', ac.userInfo?.id, tapStat?.stat],
-        initialData: { hasUnRead: false, remain: 0, success: 0 },
+        initialData: undefined,
         queryFn: async () => {
             const tapRemain = await Api.get<RES<{ success: number, remain: number }>>(`/api/extension/tap/remain`).then(item => item.data.data)
             const unReadTap = await Api.get<RES<{ hasUnRead: boolean }>>(`/api/extension/tap/unread`).then(item => item.data.data)
@@ -34,6 +34,7 @@ function useTapStat() {
     }, 1000)
 
     const isSleep = tapRemain?.remain == 0 || (Boolean(tapStat) && tapStat.stat === 'success' && ((ctime - tapStat.lastSuccessTime) < 10000))
+
     return {
         showType: !Boolean(tapRemain) ? '' : taps.length || tapRemain.hasUnRead ? 'ontap' : isSleep ? 'sleep' : 'tap',
         isTaping: Boolean(tapStat) && tapStat.stat === 'taping',
@@ -67,15 +68,15 @@ export function Tap() {
                 {ts.showType === 'sleep' && <AnimTapSleep />}
                 {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
-            <div className="flip_item text-[15px] font-medium mx-4">
+            <div className="flip_item text-[15px] font-medium mx-4 text-center whitespace-pre-wrap mt-4">
                 {ts.showType === 'tap' && (isTaping ? ts.msg || 'Waiting...' : 'Go find your berry friend.')}
                 {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
             {ts.showType === 'tap' && !isTaping && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
             {ts.showType === 'ontap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={() => {
+                ts.setTaps([])
                 goToAlbum()
-                setTimeout(() => ts.setTaps([]), 3000)
             }}>Check it out</button>}
         </AutoFlip>
     );

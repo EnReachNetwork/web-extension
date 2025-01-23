@@ -76,11 +76,12 @@ function ConnectedUI() {
     });
     const netQualityDeg = _.toNumber(netQuality.replace("-", "").replace("deg", ""));
     const netQualityName = netQuality === "-" ? "-" : netQualityDeg < 60 ? "Poor" : netQualityDeg < 120 ? "Good" : "Superb";
-    const total = _.toNumber(userInfo?.point.total || 0);
-    const boost = fmtBoost(userInfo?.stat.extraBoost);
-    const mTotal = fmtBerry(total * _.toNumber(boost));
+    const referral = _.toNumber(userInfo?.point.referral || 0);
+    const boost = _.toNumber(fmtBoost(userInfo?.stat.extraBoost));
+    const network = _.toNumber(userInfo?.point.network || 0) * boost;
+    const mTotal = fmtBerry(referral + network);
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
-   
+
     return (
         <AutoFlip className="flex flex-col items-center w-full h-full logo_bg p-[18px] gap-7 relative">
             <HeaderLogo />
@@ -128,7 +129,7 @@ function ConnectedUI() {
                 </div>
             </div>
             <GoToDashboard className="flip_item mb-[18px] mt-auto" />
-            <TapSprite/>
+            <TapSprite />
         </AutoFlip>
     );
 }
