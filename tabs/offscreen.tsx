@@ -1,5 +1,5 @@
-import { openOnTapPeer } from "~tabs/onTap";
-import { startTap } from "~tabs/tap";
+import { openOnTapPeer } from "~core/onTap";
+import { startTap } from "~core/tap";
 
 chrome.runtime.onMessage.addListener((msg, sender, sendRes) => {
     // console.info('onMsg', msg, sender)

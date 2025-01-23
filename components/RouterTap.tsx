@@ -69,7 +69,7 @@ export function Tap() {
                 {ts.showType === 'ontap' && <AnimOnTap />}
             </div>
             <div className="flip_item text-[15px] font-medium mx-4 text-center whitespace-pre-wrap mt-4">
-                {ts.showType === 'tap' && (isTaping ? ts.msg || 'Waiting...' : 'Go find your berry friend.')}
+                {ts.showType === 'tap' && (isTaping ? ts.msg || 'Waiting...' : 'Go find your Buddy！！')}
                 {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>

@@ -1,5 +1,4 @@
 import { clsx, type ClassValue } from "clsx";
-import _ from "lodash";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -37,4 +36,8 @@ export async function retry<T>(fn: () => Promise<T> | T, { interval = 1000, coun
         count--;
         await sleep(interval);
     }
+}
+
+export function now() {
+    return new Date().getTime();
 }
