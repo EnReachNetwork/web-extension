@@ -35,7 +35,7 @@ function useTapStat() {
     const isOnTap = taps.length || tapRemain?.hasUnRead
 
     return {
-        showType: !Boolean(tapRemain) ? '' : isTaping ? 'taping' : (tapSuccess || isOnTap) ? 'ontap' : tapRemain?.remain == 0 ? 'sleep' : 'tap',
+        showType: !Boolean(tapRemain) ? '' : isTaping ? 'taping' : (tapSuccess || isOnTap) ? 'ontap' : tapRemain?.remain <= 0 ? 'sleep' : 'tap',
         isOnTap,
         isTaping,
         taps,
