@@ -55,13 +55,13 @@ body {
 }
 
 .tap-sprite1 {
-    background: url("url:~assets/tap-sprite1.svg") no-repeat;
+    background: center/contain url("url:~assets/tap-sprite1.svg") no-repeat;
 }
 .tap-sprite2 {
-    background: url("url:~assets/tap-sprite2.svg") no-repeat;
+    background: center/contain url("url:~assets/tap-sprite2.svg") no-repeat;
 }
 .tap-sprite3 {
-    background: url("url:~assets/tap-sprite3.svg") no-repeat;
+    background: center/contain url("url:~assets/tap-sprite3.svg") no-repeat;
 }
 
 /* HTML: <div class="loader"></div> */

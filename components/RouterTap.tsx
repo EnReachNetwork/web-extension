@@ -40,6 +40,7 @@ function useTapStat() {
         isTaping,
         taps,
         msg: tapStat?.msg,
+        todaySuccess: tapRemain?.success || 0,
         setTapStat: (ts: Partial<TapStat>) => setTapStat({ ...(tapStat || { stat: null, msg: '', lastSuccessTime: 0 }), ...ts }),
         setTaps
     }
@@ -71,7 +72,7 @@ export function Tap() {
             <div className="flip_item text-[15px] font-medium mx-4 text-center whitespace-pre-wrap mt-4">
                 {ts.showType === 'tap' && (ts.msg || 'Go find your Buddy！！')}
                 {ts.showType === 'taping' && (ts.msg || 'Waiting...')}
-                {ts.showType === 'sleep' && 'Your berry is feeling good staying at home.'}
+                {ts.showType === 'sleep' && (ts.todaySuccess >= 3 ? "Enough Berry Buddies for today. Try tomorrow!" : 'Get one more Like on your album and you can have one extra Berry Friend fo today.')}
                 {ts.showType === 'ontap' && 'Your berry found a new friend!'}
             </div>
             {ts.showType === 'tap' && <button className="flip_item text-sm font-medium btn2 w-[129px]" onClick={onClickStart}>Start</button>}
