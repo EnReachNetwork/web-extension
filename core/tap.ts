@@ -283,9 +283,10 @@ async function doTap(userId: string) {
 }
 
 let tapRuning = false;
-export async function startTap(userId: string) {
+export function startTap(userId: string) {
     if (tapRuning) return;
     tapRuning = true;
-    await doTap(userId);
-    tapRuning = false;
+    doTap(userId).finally(() => {
+        tapRuning = false;
+    });
 }
