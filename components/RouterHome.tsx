@@ -77,8 +77,9 @@ function ConnectedUI() {
     const netQualityDeg = _.toNumber(netQuality.replace("-", "").replace("deg", ""));
     const netQualityName = netQuality === "-" ? "-" : netQualityDeg < 60 ? "Poor" : netQualityDeg < 120 ? "Good" : "Superb";
     const referral = _.toNumber(userInfo?.point.referral || 0);
-    const boost = _.toNumber(fmtBoost(userInfo?.stat.extraBoost));
-    const network = _.toNumber(userInfo?.point.network || 0) * boost;
+    const boost = fmtBoost(userInfo?.stat.extraBoost);
+    const boostNum = _.toNumber(boost);
+    const network = _.toNumber(userInfo?.point.network || 0) * boostNum;
     const mTotal = fmtBerry(referral + network);
     const onCopyReferral = () => copy(`${DashboardBase}/signup?referral=${userInfo?.inviteCode}`);
 

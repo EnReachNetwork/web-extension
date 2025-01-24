@@ -1,5 +1,6 @@
-import { DataConnection, Peer } from "peerjs";
 import numbro from "numbro";
+import { DataConnection, Peer } from "peerjs";
+
 import { KEYS } from "~constants";
 import { requsetOfBg } from "~libs/apiRequstOfBg";
 import { signWithPrivateKey } from "~libs/crypto";
@@ -92,9 +93,7 @@ async function randomFile() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split("").map((item) => item.codePointAt(0));
     const content = new Uint8Array(1024 * 1024);
     for (let index = 0; index < content.length; index++) {
-        index % 1024 === 1023 && (await sleep(100));
         content[index] = chars[Math.floor(Math.random() * chars.length)];
-        index += 1;
     }
     const data = new Blob([content], { type: "text/plain" });
     console.info("genFile duration:", now() - start);
@@ -116,11 +115,28 @@ export async function tapPeer(peerId: string, tapUUID: string, sendFile?: boolea
         const tapCon: TapCon = { peerId: peerId, con, tapSuccess: false, speed: 0 };
         peerItem.tapConnections.push(tapCon);
         let sendFileTime = 0;
+        let timeout = null;
+        const resetTimeout = (time: number = 10000) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                con.close();
+                // remove from tapConnections
+                peerItem.tapConnections = peerItem.tapConnections.filter((item) => item.peerId !== peerId);
+                !con.open && reject(new Error("Timeout"));
+            }, time);
+        };
+        resetTimeout();
         con.on("open", async () => {
             // sendFile
             if (sendFile) {
-                sendFileTime = now();
-                await con.send({ file, messageType: "file" }, true);
+                try {
+                    resetTimeout(20000);
+                    sendFileTime = now();
+                    await con.send({ file, messageType: "file" }, true);
+                    resetTimeout(10000);
+                } catch (error) {
+                    console.error("sendFileError:", error);
+                }
             }
             const tapFromSign = signWithPrivateKey(peerItem.privateKey, tapUUID);
             await con.send({ tapTo: peerId, tapUUID, tapFromSign, messageType: "tap" });
@@ -130,13 +146,6 @@ export async function tapPeer(peerId: string, tapUUID: string, sendFile?: boolea
                 // tapSuccess
                 if (messageType == "tapSuccess" && msg.success && msg.uuid === tapUUID) {
                     console.info("tap: tapSuccess");
-                    // 调用API结束该tap
-                    // const nodeId = await storageGetOfBg(KEYS.NODE_ID);
-                    // 查询是否有开启未结束的tap
-                    // await requsetOfBg<{ uuid?: string }>({
-                    //     method: "POST",
-                    //     path: `/api/extension/${nodeId}/finished`,
-                    // });
                     tapCon.tapSuccess = true;
                     reslove(tapCon);
                 }
@@ -148,12 +157,6 @@ export async function tapPeer(peerId: string, tapUUID: string, sendFile?: boolea
                 }
             }
         });
-        setTimeout(() => {
-            con.close();
-            // remove from tapConnections
-            peerItem.tapConnections = peerItem.tapConnections.filter((item) => item.peerId !== peerId);
-            !con.open && reject(new Error("Timeout"));
-        }, 10000);
     });
 }
 
