@@ -63,7 +63,7 @@ async function setupOffscreenDocument() {
 }
 
 async function main() {
-    storage.remove(KEYS.TAP_STAT)
+    storage.remove(KEYS.TAP_STAT);
     connectByAuthUser();
     storage.watch({
         [KEYS.USER_INFO]: connectByAuthUser,
@@ -90,8 +90,7 @@ async function main() {
         },
         10000,
     );
-
-    chrome.action.openPopup();
+    if (chrome.action.openPopup) chrome.action.openPopup();
     //
     setupOffscreenDocument();
 
