@@ -213,27 +213,32 @@ export async function connectPeerJsServer(userId: string, uuid: string, nodeId: 
     if (peerItem.userId === userId && peerItem.peer && peerItem.peer.open) {
         resetCloseTask();
     } else {
-        closePeer();
-        const peer = await createPeer({ userId, uuid, enableTurnServer: peerItem.enableTurnServer, nodeId });
-        const { privateKey } = (await storageGetOfBg(KEYS.USER_INFO)) as User;
-        peerItem.peer = peer;
-        peerItem.userId = userId;
-        peerItem.privateKey = privateKey;
-        peerItem.uuid = uuid;
-        peerItem.closed = false;
-        peer.on("error", (error) => {
-            console.error("peer err:", error);
-            closePeer();
-        });
-        peer.on("open", (id) => {
-            console.info("open", id);
-        });
-        resetCloseTask();
-        while (true) {
-            await sleep(200);
-            if (peer.open) return true;
-            if (peerItem.closed) throw new Error("Connect PeerjsServer Error");
-        }
+        await retry(
+            async () => {
+                closePeer();
+                const peer = await createPeer({ userId, uuid, enableTurnServer: peerItem.enableTurnServer, nodeId });
+                const { privateKey } = (await storageGetOfBg(KEYS.USER_INFO)) as User;
+                peerItem.peer = peer;
+                peerItem.userId = userId;
+                peerItem.privateKey = privateKey;
+                peerItem.uuid = uuid;
+                peerItem.closed = false;
+                peer.on("error", (error) => {
+                    console.error("peer err:", error);
+                    closePeer();
+                });
+                peer.on("open", (id) => {
+                    console.info("open", id);
+                });
+                resetCloseTask();
+                while (true) {
+                    await sleep(200);
+                    if (peer.open) return true;
+                    if (peerItem.closed) throw new Error("Connect PeerjsServer Error");
+                }
+            },
+            { count: 6, interval: 1500 },
+        );
     }
 }
 
