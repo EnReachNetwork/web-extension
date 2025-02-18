@@ -23,7 +23,7 @@ function resetCloseTask() {
 
 export async function openOnTapPeer(userId: string, uuid: string) {
     if (!catchPeer) {
-        catchPeer = await createPeer(userId, uuid, true);
+        catchPeer = await createPeer({ userId, uuid, enableTurnServer: true });
     }
     const { privateKey } = (await storageGetOfBg(KEYS.USER_INFO)) as User;
     const peer = catchPeer;

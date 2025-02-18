@@ -7,7 +7,7 @@ import { signWithPrivateKey } from "~libs/crypto";
 import { storageGetOfBg, storageSetOfBg } from "~libs/reqStorageOfBg";
 import { NodeID, TapStat } from "~libs/type";
 import { User } from "~libs/user";
-import { now, sleep } from "~libs/utils";
+import { now, retry, sleep } from "~libs/utils";
 
 import { createPeer } from "./peer";
 
@@ -56,17 +56,27 @@ export async function updateTapStat(stat: Partial<TapStat> = {}) {
     await storageSetOfBg(KEYS.TAP_STAT, { ...last, ...stat });
 }
 
+async function retryStart() {
+    return retry(
+        async () => {
+            const nodeId = await storageGetOfBg<NodeID>(KEYS.NODE_ID);
+            const { uuid } = await requsetOfBg<{ uuid?: string }>({
+                method: "POST",
+                path: `/api/extension/${nodeId}/start`,
+            });
+
+            if (!uuid) {
+                // 未找到其他在线用户, 无法tap
+                throw new Error("Not find online user");
+            }
+            return { uuid, nodeId };
+        },
+        { count: 6, interval: 1500 },
+    );
+}
 async function startAndGetTapData() {
-    const nodeId = await storageGetOfBg<NodeID>(KEYS.NODE_ID);
-    // 查询是否有开启未结束的tap
-    const { uuid } = await requsetOfBg<{ uuid?: string }>({
-        method: "POST",
-        path: `/api/extension/${nodeId}/start`,
-    });
-    if (!uuid) {
-        // 未找到其他在线用户, 无法tap
-        throw new Error("Not find online user");
-    }
+    // 开启tap
+    const { uuid, nodeId } = await retryStart();
     // 建立连接前查询是否有连接的节点，如果没有等待tap的节点连接后建立连接
     let peers: string[] = [];
     let tapStart = true;
@@ -74,16 +84,16 @@ async function startAndGetTapData() {
     while (peers.length === 0 && tapStart) {
         if (new Date().getTime() - now > 1000 * 10) {
             // 超时时间无选中用户连接则停止tap
-            throw new Error("Find for online users timeout");
+            throw new Error("Wait remote peerjs clients timeout.");
         }
         // 查询是否有连接的节点
+        await sleep(500);
         const data = await requsetOfBg<{ tapStart: boolean; peers: string[]; uuid: string }>({
             method: "GET",
             path: `/api/extension/${nodeId}/peers`,
         });
         tapStart = data.tapStart;
         peers = data.peers;
-        await sleep(1 * 1000);
     }
     return { peers, uuid, nodeId };
 }
@@ -116,25 +126,29 @@ export async function tapPeer(peerId: string, tapUUID: string, sendFile?: boolea
         peerItem.tapConnections.push(tapCon);
         let sendFileTime = 0;
         let timeout = null;
-        const resetTimeout = (time: number = 10000) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                con.close();
-                // remove from tapConnections
-                peerItem.tapConnections = peerItem.tapConnections.filter((item) => item.peerId !== peerId);
-                !con.open && reject(new Error("Timeout"));
-            }, time);
+
+        const closeThis = () => {
+            con.close();
+            // remove from tapConnections
+            peerItem.tapConnections = peerItem.tapConnections.filter((item) => item.peerId !== peerId);
+            !con.open && reject(new Error("Timeout"));
         };
-        resetTimeout();
+        const resetTimeout = (time: number = 10000) => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(closeThis, time);
+        };
+        resetTimeout(3000);
         con.on("open", async () => {
+            resetTimeout();
             // sendFile
             if (sendFile) {
                 try {
-                    resetTimeout(20000);
                     sendFileTime = now();
                     await con.send({ file, messageType: "file" }, true);
-                    resetTimeout(10000);
                 } catch (error) {
+                    closeThis();
                     console.error("sendFileError:", error);
                 }
             }
@@ -163,7 +177,7 @@ export async function tapPeer(peerId: string, tapUUID: string, sendFile?: boolea
 async function checkTapSuccess() {
     if (peerItem.tapConnections.length == 0) return false;
     while (peerItem.closed == false && peerItem.tapConnections.length > 0) {
-        await sleep(500);
+        await sleep(300);
         const item = peerItem.tapConnections.find((item) => item.tapSuccess);
         if (item) {
             return true;
@@ -185,7 +199,7 @@ async function checkTapConOpend() {
 async function checkTapSpeed() {
     if (peerItem.tapConnections.length == 0) return 0;
     while (peerItem.closed == false && peerItem.tapConnections.length > 0) {
-        await sleep(500);
+        await sleep(300);
         const item = peerItem.tapConnections.find((item) => item.speed > 0);
         if (item) {
             return item.speed;
@@ -194,13 +208,13 @@ async function checkTapSpeed() {
     return 0;
 }
 
-export async function connectPeerJsServer(userId: string, uuid: string) {
+export async function connectPeerJsServer(userId: string, uuid: string, nodeId: string) {
     // 确认是否是当前用户(对应浏览器多账户切换场景)
     if (peerItem.userId === userId && peerItem.peer && peerItem.peer.open) {
         resetCloseTask();
     } else {
         closePeer();
-        const peer = await createPeer(userId, uuid, peerItem.enableTurnServer);
+        const peer = await createPeer({ userId, uuid, enableTurnServer: peerItem.enableTurnServer, nodeId });
         const { privateKey } = (await storageGetOfBg(KEYS.USER_INFO)) as User;
         peerItem.peer = peer;
         peerItem.userId = userId;
@@ -216,7 +230,7 @@ export async function connectPeerJsServer(userId: string, uuid: string) {
         });
         resetCloseTask();
         while (true) {
-            await sleep(500);
+            await sleep(200);
             if (peer.open) return true;
             if (peerItem.closed) throw new Error("Connect PeerjsServer Error");
         }
@@ -224,57 +238,69 @@ export async function connectPeerJsServer(userId: string, uuid: string) {
 }
 
 async function doTap(userId: string) {
+    const startTime = new Date().getTime();
     // 将状态写入到localstorage用于页面修改状态
     try {
         // await sleep(1000);
         await updateTapStat({ stat: "taping", lastSuccessTime: 0, msg: "Looking for a Berry Buddy. Please kindly wait." });
         // 查询是否有开启未结束的tap
-        const { uuid, peers } = await startAndGetTapData();
+        const { uuid, peers, nodeId } = await startAndGetTapData();
+        console.info("doTap", "startAndGetTapData", new Date().getTime() - startTime);
         /* 1. first unuse TurnServer */
         if (peerItem.enableTurnServer) {
             peerItem.enableTurnServer = false;
             closePeer();
         }
         await updateTapStat({ msg: "Trying to build peer-to-peer connection to a randomly discovered node." });
-        await connectPeerJsServer(userId, uuid);
+        await connectPeerJsServer(userId, uuid, nodeId);
+        console.info("doTap", "connectedPeerJsServer by unuse turn server", new Date().getTime() - startTime);
         // try tap unuse TurnServer
         for (const peerId of peers) {
             tapPeer(peerId, uuid, true).catch(console.error);
         }
         await sleep(500);
         const speed = await checkTapSpeed();
-        console.info("checkSpeed:", speed);
+        console.info("doTap", "checkSpeed:", speed, new Date().getTime() - startTime);
         if (speed > 0) {
             await updateTapStat({ msg: `Connected with a peer node. Testing p2p file transfer -- ${fmtSpeed(speed)}B/s.` });
         }
+
         // chek tap success
         if (await checkTapSuccess()) {
+            if (speed > 0) {
+                await sleep(1000);
+            }
+            console.info("doTap", "success by unuse turn server", new Date().getTime() - startTime);
             await updateTapStat({ msg: "Peer connection successful. Your Berry will come back soon." });
-            await sleep(3000);
+            await sleep(2000);
             await updateTapStat({ stat: "success", lastSuccessTime: new Date().getTime(), msg: "" });
             return true;
         }
+        console.info("doTap", "close Peer", new Date().getTime() - startTime);
         // closePeer;
         closePeer();
 
         /*2. open TurnServer;*/
         peerItem.enableTurnServer = true;
         await updateTapStat({ msg: "Connecting to a randomly designated peer... " });
-        await connectPeerJsServer(userId, uuid);
+        await connectPeerJsServer(userId, uuid, nodeId);
+        console.info("doTap", "connectedPeerJsServer by use turn server", new Date().getTime() - startTime);
         // try tap by TurnServer;
         for (const peerId of peers) {
             tapPeer(peerId, uuid).catch(console.error);
         }
         // checkTapSuccess
         if (await checkTapSuccess()) {
+            console.info("doTap", "success by use turn server", new Date().getTime() - startTime);
             await updateTapStat({ msg: "Peer connection successful. Your Berry will come back soon." });
-            await sleep(3000);
+            await sleep(2000);
             await updateTapStat({ stat: "success", lastSuccessTime: new Date().getTime(), msg: "" });
             return true;
         } else {
             throw new Error("Timeout");
         }
     } catch (e) {
+        console.error("doTap", new Date().getTime() - startTime, e);
         closePeer();
         // await updateTapStat({ msg: "Connection failed. You can try another time or check your network connectivity." });
         // await sleep(3000);

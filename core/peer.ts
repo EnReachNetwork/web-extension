@@ -6,19 +6,22 @@ import { storageGetOfBg } from "~libs/reqStorageOfBg";
 import { retry } from "~libs/utils";
 
 async function getTurnServers() {
-    return retry(async () => {
-        const { apiKey } = await requsetOfBg<{ apiKey: string; expire: number }>({ path: "/api/extension/turn/apiKey", method: "GET" });
-        return fetch(`https://mla2.metered.live/api/v1/turn/credentials?apiKey=${apiKey}`).then<any[]>((response) => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        });
-    });
+    return retry(
+        async () => {
+            const { apiKey } = await requsetOfBg<{ apiKey: string; expire: number }>({ path: "/api/extension/turn/apiKey", method: "GET" });
+            return fetch(`https://mla2.metered.live/api/v1/turn/credentials?apiKey=${apiKey}`).then<any[]>((response) => {
+                if (!response.ok) {
+                    throw new Error("Get TurnServers Error");
+                }
+                return response.json();
+            });
+        },
+        { count: 3 },
+    );
 }
 
-export async function createPeer(userId: string, uuid: string, enableTurnServer: boolean) {
-    const nodeId = (await storageGetOfBg(KEYS.NODE_ID)) as string;
+export async function createPeer(opts: { userId: string; uuid: string; enableTurnServer: boolean; nodeId?: string }) {
+    const { userId, uuid, enableTurnServer, nodeId = (await storageGetOfBg(KEYS.NODE_ID)) as string } = opts;
     const token = Buffer.from(
         JSON.stringify({
             userId,
@@ -45,5 +48,3 @@ export async function createPeer(userId: string, uuid: string, enableTurnServer:
     });
     return peer;
 }
-
-
