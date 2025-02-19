@@ -5,16 +5,31 @@ import { requsetOfBg } from "~libs/apiRequstOfBg";
 import { storageGetOfBg } from "~libs/reqStorageOfBg";
 import { retry } from "~libs/utils";
 
+// async function getTurnServers() {
+//     return retry(
+//         async () => {
+//             const { apiKey } = await requsetOfBg<{ apiKey: string; expire: number }>({ path: "/api/extension/turn/apiKey", method: "GET" });
+//             return fetch(`https://mla2.metered.live/api/v1/turn/credentials?apiKey=${apiKey}`).then<any[]>((response) => {
+//                 if (!response.ok) {
+//                     throw new Error("Get TurnServers Error");
+//                 }
+//                 return response.json();
+//             });
+//         },
+//         { count: 3 },
+//     );
+// }
 async function getTurnServers() {
     return retry(
         async () => {
-            const { apiKey } = await requsetOfBg<{ apiKey: string; expire: number }>({ path: "/api/extension/turn/apiKey", method: "GET" });
-            return fetch(`https://mla2.metered.live/api/v1/turn/credentials?apiKey=${apiKey}`).then<any[]>((response) => {
-                if (!response.ok) {
-                    throw new Error("Get TurnServers Error");
-                }
-                return response.json();
-            });
+            const { iceServers } = await requsetOfBg<{
+                iceServers: {
+                    username: string;
+                    urls: string[];
+                    credential: string;
+                };
+            }>({ path: "/api/extension/turn/list", method: "GET" });
+            return [iceServers];
         },
         { count: 3 },
     );
@@ -39,7 +54,7 @@ export async function createPeer(opts: { userId: string; uuid: string; enableTur
         config: {
             iceServers: [
                 {
-                    urls: "stun:stun.relay.metered.ca:80",
+                    urls: ["stun:hk-turn1.xirsys.com", "stun:stun.relay.metered.ca:80", "stun:us-turn10.xirsys.com"],
                 },
                 ...turns,
             ],
